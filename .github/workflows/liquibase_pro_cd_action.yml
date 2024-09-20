@@ -8,7 +8,7 @@ name: 'Liquibase Pro CD Job'
 on:
   push:
     branches:
-      - 'development'
+      - 'develop'
 
 ####################################################################
 #  Set up the environment
