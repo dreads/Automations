@@ -6,7 +6,7 @@ name: 'Liquibase Pro Artifact Creation'
 on:
   push:
     branches:
-      - 'development'
+      - 'develop'
 
 env:
   # AWS S3 bucket is the host part of the S3 bucket
