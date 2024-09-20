@@ -44,24 +44,10 @@ env:
 
 jobs:
   ####################################################################
-  #  Print out information about the triggering event
-  ####################################################################
-  print-event-details:
-    name: Print event
-    runs-on: [self-hosted]
-    steps:
-      - name: Print GitHub context
-        env:
-          GITHUB_CONTEXT: ${{ toJson(github) }}
-        run: |
-          echo "$GITHUB_CONTEXT"
-
-  ####################################################################
   #  Initialization
   ####################################################################
   init:
     runs-on: [self-hosted]
-    needs: [print-event-details]
     outputs:
       environment: ${{ steps.set-environment.outputs.environment }}
     steps:
@@ -73,12 +59,12 @@ jobs:
       - name: Set Environment
         id: set-environment
         run: |
-          echo "environment=LOWER" >> $GITHUB_OUTPUT
+          echo "environment=DEV" >> $GITHUB_OUTPUT
           if [[ "${{github.base_ref}}" == qa || "${{github.ref}}" == refs/heads/qa ]]; then
-            echo "environment=UPPER" >> $GITHUB_OUTPUT
+            echo "environment=QA" >> $GITHUB_OUTPUT
           fi
           if [[ "${{github.base_ref}}" == release* || "${{github.ref}}" == refs/heads/release* ]]; then
-            echo "environment=PRODUCTION" >> $GITHUB_OUTPUT
+            echo "environment=PROD" >> $GITHUB_OUTPUT
           fi
 
   ###################################################################

@@ -95,12 +95,12 @@ jobs:
       - name: Set Environment
         id: set-environment
         run: |
-          echo "environment=LOWER" >> $GITHUB_OUTPUT
-          if [[ "${{ inputs.environment }}" == UPPER ]]; then
-            echo "environment=UPPER" >> $GITHUB_OUTPUT
+          echo "environment=DEV" >> $GITHUB_OUTPUT
+          if [[ "${{ inputs.environment }}" == QA ]]; then
+            echo "environment=QA" >> $GITHUB_OUTPUT
           fi
-          if [[ "${{ inputs.environment }}" == PRODUCTION ]]; then
-            echo "environment=PRODUCTION" >> $GITHUB_OUTPUT
+          if [[ "${{ inputs.environment }}" == PROD ]]; then
+            echo "environment=PROD" >> $GITHUB_OUTPUT
           fi
 
   ####################################################################

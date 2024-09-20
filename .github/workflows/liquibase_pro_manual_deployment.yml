@@ -76,7 +76,7 @@ jobs:
   #  Initialization
   ####################################################################
   init:
-#    if: inputs.environment != 'LOWER'
+#    if: inputs.environment != 'DEV'
     runs-on: [self-hosted]
     outputs:
       environment: ${{ steps.set-environment.outputs.environment }}
@@ -89,19 +89,19 @@ jobs:
       - name: Set Environment
         id: set-environment
         run: |
-          echo "environment=LOWER" >> $GITHUB_OUTPUT
-          if [[ "${{ inputs.environment }}" == UPPER ]]; then
-            echo "environment=UPPER" >> $GITHUB_OUTPUT
+          echo "environment=DEV" >> $GITHUB_OUTPUT
+          if [[ "${{ inputs.environment }}" == QA ]]; then
+            echo "environment=QA" >> $GITHUB_OUTPUT
           fi
-          if [[ "${{ inputs.environment }}" == PRODUCTION ]]; then
-            echo "environment=PRODUCTION" >> $GITHUB_OUTPUT
+          if [[ "${{ inputs.environment }}" == PROD ]]; then
+            echo "environment=PROD" >> $GITHUB_OUTPUT
           fi
 
   ####################################################################
   #  Extract the artifact
   #####################################################################
   extract-artifact:
-    if: ${{ inputs.environment}} == 'UPPER' || $${{ inputs.environment}} == 'PRODUCTION'
+    if: ${{ inputs.environment}} == 'QA' || $${{ inputs.environment}} == 'PROD'
     runs-on: [self-hosted]
     needs: init
     steps:

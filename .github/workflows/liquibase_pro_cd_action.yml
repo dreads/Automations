@@ -59,12 +59,12 @@ jobs:
       - name: Set Environment
         id: set-environment
         run: |
-          echo "environment=LOWER" >> $GITHUB_OUTPUT
+          echo "environment=DEV" >> $GITHUB_OUTPUT
           if [[ "${{github.base_ref}}" == qa || "${{github.ref}}" == refs/heads/qa ]]; then
-            echo "environment=UPPER" >> $GITHUB_OUTPUT
+            echo "environment=QA" >> $GITHUB_OUTPUT
           fi
           if [[ "${{github.base_ref}}" == release* || "${{github.ref}}" == refs/heads/release* ]]; then
-            echo "environment=PRODUCTION" >> $GITHUB_OUTPUT
+            echo "environment=PROD" >> $GITHUB_OUTPUT
           fi
 
   print-environment:
@@ -79,7 +79,7 @@ jobs:
 #  Check out the source code
 ####################################################################
   checkout-repo:
-    if: ${{needs.init.outputs.environment}} == LOWER
+    if: ${{needs.init.outputs.environment}} == DEV
     runs-on: [self-hosted]
     needs: init
     steps:
