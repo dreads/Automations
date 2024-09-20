@@ -1,0 +1,123 @@
+####################################################################
+#  GitHub Action to perform continuous integration (CI) of database
+#  changes using Liquibase Pro
+#####################################################################
+name: 'Liquibase Pro CI Job'
+
+on:
+  pull_request:
+    types: [opened, reopened, synchronize]
+    branches:
+      - 'development'
+
+####################################################################
+#  Set up the environment
+#####################################################################
+env:
+  #  The top level Flow File that orchestrates the database changes
+  FLOW_FILE: "liquibase-premerge.flowfile.yaml"
+
+  #  Search path, as needed (See https://docs.liquibase.com/concepts/changelogs/how-liquibase-finds-files.html)
+  #  LIQUIBASE_SEARCH_PATH: src/main/resources/changelogs
+
+  #  The database changelog. See https://docs.liquibase.com/concepts/changelogs/working-with-changelogs.html
+  LIQUIBASE_COMMAND_CHANGELOG_FILE: "root_changelog.xml"
+
+  #  Location of the Quality Checks settings file
+  LIQUIBASE_COMMAND_CHECKS_SETTINGS_FILE: ${{ vars.LIQUIBASE_COMMAND_CHECKS_SETTINGS_FILE }}
+
+  #  Pro License key
+  #  See https://docs.liquibase.com/workflows/liquibase-pro/how-to-apply-your-liquibase-pro-license-key.html
+  LIQUIBASE_LICENSE_KEY: ${{ secrets.LIQUIBASE_PRO_LICENSE_KEY }}
+
+  #  JDBC URL of the database per environment
+  #  See https://docs.liquibase.com/workflows/liquibase-community/using-jdbc-url-in-liquibase.html
+  LIQUIBASE_COMMAND_URL: ${{ vars.LIQUIBASE_URL }}
+
+  #  Credentials for the environment's database https://docs.liquibase.com/parameters/command-parameters.html
+  LIQUIBASE_COMMAND_USERNAME: ${{ secrets.LIQUIBASE_USERNAME }}
+  LIQUIBASE_COMMAND_PASSWORD: ${{ secrets.LIQUIBASE_PASSWORD }}
+  #
+  #  Logging Settings
+  LIQUIBASE_LOG_FORMAT: JSON
+  LIQUIBASE_LOG_LEVEL: INFO
+
+jobs:
+  ####################################################################
+  #  Print out information about the triggering event
+  ####################################################################
+  print-event-details:
+    name: Print event
+    runs-on: [self-hosted]
+    steps:
+      - name: Print GitHub context
+        env:
+          GITHUB_CONTEXT: ${{ toJson(github) }}
+        run: |
+          echo "$GITHUB_CONTEXT"
+
+  ####################################################################
+  #  Initialization
+  ####################################################################
+  init:
+    runs-on: [self-hosted]
+    needs: [print-event-details]
+    outputs:
+      environment: ${{ steps.set-environment.outputs.environment }}
+    steps:
+      - name: Cancel previous workflow
+        uses: styfle/cancel-workflow-action@0.12.1
+        with:
+          access_token: ${{ github.token }}
+
+      - name: Set Environment
+        id: set-environment
+        run: |
+          echo "environment=LOWER" >> $GITHUB_OUTPUT
+          if [[ "${{github.base_ref}}" == qa || "${{github.ref}}" == refs/heads/qa ]]; then
+            echo "environment=UPPER" >> $GITHUB_OUTPUT
+          fi
+          if [[ "${{github.base_ref}}" == release* || "${{github.ref}}" == refs/heads/release* ]]; then
+            echo "environment=PRODUCTION" >> $GITHUB_OUTPUT
+          fi
+
+  ###################################################################
+  #  Check out the source code
+  ####################################################################
+  checkout-repo:
+    needs: [init]
+    # Our database runs on Liquibase internal network, so we use a self-hosted runner
+    # https://docs.github.com/en/actions/using-github-hosted-runners/connecting-to-a-private-network
+    runs-on: [self-hosted]
+
+    steps:
+      # Check out the source code
+      - name: Checkout repo
+        uses: actions/checkout@v3
+
+
+  ####################################################################
+  #  Perform Liquibase Pro database change control operations
+  #####################################################################
+  liquibase-checks:
+    needs: [checkout-repo, init]
+    # Our database runs on Liquibase internal network, so we use a self-hosted runner
+    # https://docs.github.com/en/actions/using-github-hosted-runners/connecting-to-a-private-network
+    runs-on: [self-hosted]
+
+    environment: ${{needs.init.outputs.environment}}
+
+    steps:
+      # Validate parseability of the Flow file
+      - name: Validate flow
+        run: |
+          liquibase --license-key=${{ env.LIQUIBASE_PRO_LICENSE_KEY }} flow validate \
+             --flow-file=${{ env.FLOW_FILE }} \
+             --logfile=logs/liquibase.log
+      ##
+      # Execute the Flow file
+      - name: Run flow
+        run: |
+          liquibase --license-key=${{ env.LIQUIBASE_LICENSE_KEY }} flow \
+             --flow-file=${{ env.FLOW_FILE }} \
+             --logfile=logs/liquibase.log
