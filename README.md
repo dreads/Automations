@@ -1,0 +1,2 @@
+# Automations
+Liquibase Automation Examples
