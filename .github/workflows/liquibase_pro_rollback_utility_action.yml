@@ -13,7 +13,7 @@ on:
       environment:
         description: 'Environment:'
         type: environment
-        default: development
+        default: develop
         required: true
       # Which rollback command to use. See the following:
       #  https://docs.liquibase.com/commands/rollback/rollback-by-tag.html
