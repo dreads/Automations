@@ -140,7 +140,7 @@ jobs:
   #  Perform Liquibase Pro database change control operations
   #####################################################################
   liquibase-deployment:
-    needs: [init, extract-artifact]
+    needs: [init, checkout-repo]
     runs-on: [self-hosted]
 
     environment: ${{needs.init.outputs.environment}}
