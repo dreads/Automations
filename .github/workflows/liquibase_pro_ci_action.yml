@@ -17,8 +17,8 @@ env:
   #  The top level Flow File that orchestrates the database changes
   FLOW_FILE: "liquibase-process/flowfiles/liquibase-premerge.flowfile.yaml"
 
-  #  Search path, as needed (See https://docs.liquibase.com/concepts/changelogs/how-liquibase-finds-files.html)
-  #  LIQUIBASE_SEARCH_PATH: src/main/resources/changelogs
+  #  Search path (See https://docs.liquibase.com/concepts/changelogs/how-liquibase-finds-files.html)
+  LIQUIBASE_SEARCH_PATH: ".,liquibase-process"
 
   #  The database changelog. See https://docs.liquibase.com/concepts/changelogs/working-with-changelogs.html
   LIQUIBASE_COMMAND_CHANGELOG_FILE: "sqlcode/rootchangelog.yaml"
