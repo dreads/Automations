@@ -75,28 +75,30 @@ jobs:
           ENVIRONMENT: ${{needs.init.outputs.environment}}
         run: echo "$ENVIRONMENT"
 
-####################################################################
-#  Check out the source code
-####################################################################
+  ###################################################################
+  #  Check out the source code
+  ####################################################################
   checkout-repo:
-    if: ${{needs.init.outputs.environment}} == DEV
+    needs: [init]
+    # Our database runs on Liquibase internal network, so we use a self-hosted runner
+    # https://docs.github.com/en/actions/using-github-hosted-runners/connecting-to-a-private-network
     runs-on: [self-hosted]
-    needs: init
+
     steps:
       # Check out the source code
       - name: Checkout Database Source repo
         uses: actions/checkout@v3
 
-      # Check out the source code
+      # Check out the Liquibase Configuration Repo
       - name: Checkout Liquibase Configuration repo
         uses: actions/checkout@v4
         with:
           repository: adeelmalik78/Automations
           path: liquibase-process
 
-####################################################################
-#  Perform Liquibase Pro database change control operations
-#####################################################################
+  ####################################################################
+  #  Perform Liquibase Pro database change control operations
+  #####################################################################
   liquibase-deployment:
     needs: [checkout-repo, init]
     runs-on: [self-hosted]
@@ -110,7 +112,7 @@ jobs:
           liquibase --license-key=${{ secrets.LIQUIBASE_LICENSE_KEY }} flow validate \
              --flow-file=${{ env.FLOW_FILE }} \
              --logfile=logs/liquibase.log
-#
+
       # Execute the Flow file
       - name: Run flow
         run: |

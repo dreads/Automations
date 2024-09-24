@@ -97,6 +97,26 @@ jobs:
             echo "environment=PROD" >> $GITHUB_OUTPUT
           fi
 
+  ###################################################################
+  #  Check out the source code
+  ####################################################################
+  checkout-repo:
+    needs: [init]
+    # Our database runs on Liquibase internal network, so we use a self-hosted runner
+    # https://docs.github.com/en/actions/using-github-hosted-runners/connecting-to-a-private-network
+    runs-on: [self-hosted]
+
+    steps:
+      # Check out the source code
+      - name: Checkout Database Source repo
+        uses: actions/checkout@v3
+
+      # Check out the Liquibase Configuration Repo
+      - name: Checkout Liquibase Configuration repo
+        uses: actions/checkout@v4
+        with:
+          repository: adeelmalik78/Automations
+          path: liquibase-process
   ####################################################################
   #  Extract the artifact
   #####################################################################
