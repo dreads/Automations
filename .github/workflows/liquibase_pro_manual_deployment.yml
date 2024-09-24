@@ -34,16 +34,16 @@ on:
 #####################################################################
 env:
   #  The top level Flow File that orchestrates the database changes
-  FLOW_FILE: "liquibase-postmerge.flowfile.yaml"
+  FLOW_FILE: "liquibase-process/flowfiles/liquibase-premerge.flowfile.yaml"
 
   #  Search path, as needed (See https://docs.liquibase.com/concepts/changelogs/how-liquibase-finds-files.html)
   #  LIQUIBASE_SEARCH_PATH: src/main/resources/changelogs
 
   #  The database changelog. See https://docs.liquibase.com/concepts/changelogs/working-with-changelogs.html
-  LIQUIBASE_COMMAND_CHANGELOG_FILE: "root_changelog.xml"
+  LIQUIBASE_COMMAND_CHANGELOG_FILE: "sqlcode/rootchangelog.yaml"
 
   #  Location of the Quality Checks settings file
-  LIQUIBASE_COMMAND_CHECKS_SETTINGS_FILE: ${{ vars.LIQUIBASE_COMMAND_CHECKS_SETTINGS_FILE }}
+  LIQUIBASE_COMMAND_CHECKS_SETTINGS_FILE: "liquibase-process/policychecks/liquibase.checks-settings.conf"
 
   #  Pro License key
   #  See https://docs.liquibase.com/workflows/liquibase-pro/how-to-apply-your-liquibase-pro-license-key.html
@@ -51,11 +51,11 @@ env:
 
   #  JDBC URL of the database per environment
   #  See https://docs.liquibase.com/workflows/liquibase-community/using-jdbc-url-in-liquibase.html
-  LIQUIBASE_COMMAND_URL: ${{ vars.LIQUIBASE_URL }}
+  LIQUIBASE_COMMAND_URL: ${{ secrets.LIQUIBASE_COMMAND_URL }}
 
   #  Credentials for the environment's database https://docs.liquibase.com/parameters/command-parameters.html
-  LIQUIBASE_COMMAND_USERNAME: ${{ secrets.LIQUIBASE_USERNAME }}
-  LIQUIBASE_COMMAND_PASSWORD: ${{ secrets.LIQUIBASE_PASSWORD }}
+  LIQUIBASE_COMMAND_USERNAME: ${{ secrets.LIQUIBASE_COMMAND_USERNAME }}
+  LIQUIBASE_COMMAND_PASSWORD: ${{ secrets.LIQUIBASE_COMMAND_PASSWORD }}
   #
   #  Logging Settings
   LIQUIBASE_LOG_FORMAT: JSON
@@ -97,30 +97,50 @@ jobs:
             echo "environment=PROD" >> $GITHUB_OUTPUT
           fi
 
+  ###################################################################
+  #  Check out the source code
+  ####################################################################
+  checkout-repo:
+    needs: [init]
+    # Our database runs on Liquibase internal network, so we use a self-hosted runner
+    # https://docs.github.com/en/actions/using-github-hosted-runners/connecting-to-a-private-network
+    runs-on: [self-hosted]
+
+    steps:
+      # Check out the source code
+      - name: Checkout Database Source repo
+        uses: actions/checkout@v3
+
+      # Check out the Liquibase Configuration Repo
+      - name: Checkout Liquibase Configuration repo
+        uses: actions/checkout@v4
+        with:
+          repository: adeelmalik78/Automations
+          path: liquibase-process
   ####################################################################
   #  Extract the artifact
   #####################################################################
-  extract-artifact:
-    if: ${{ inputs.environment}} == 'QA' || $${{ inputs.environment}} == 'PROD'
-    runs-on: [self-hosted]
-    needs: init
-    steps:
-
-      - name: Download artifact
-        run: |
-          aws s3 cp s3://$AWS_S3_BUCKET/SNAPSHOT-artifact-${{inputs.artifact-version}}.zip .
-
-      # Unzip the artifact into the newly created ./artifact directory
-      - name: Unzip artifact
-        run: |
-          unzip -o ./SNAPSHOT-artifact-${{inputs.artifact-version}}.zip
+#  extract-artifact:
+#    if: ${{ inputs.environment}} == 'QA' || $${{ inputs.environment}} == 'PROD'
+#    runs-on: [self-hosted]
+#    needs: init
+#    steps:
+#
+#      - name: Download artifact
+#        run: |
+#          aws s3 cp s3://$AWS_S3_BUCKET/SNAPSHOT-artifact-${{inputs.artifact-version}}.zip .
+#
+#      # Unzip the artifact into the newly created ./artifact directory
+#      - name: Unzip artifact
+#        run: |
+#          unzip -o ./SNAPSHOT-artifact-${{inputs.artifact-version}}.zip
 
 
   ####################################################################
   #  Perform Liquibase Pro database change control operations
   #####################################################################
   liquibase-deployment:
-    needs: [init, extract-artifact]
+    needs: [init, checkout-repo]
     runs-on: [self-hosted]
 
     environment: ${{needs.init.outputs.environment}}
@@ -129,7 +149,7 @@ jobs:
       # Validate parseability of the Flow file
       - name: Validate flow
         run: |
-          liquibase --license-key=${{ env.LIQUIBASE_PRO_LICENSE_KEY }} flow validate \
+          liquibase --license-key=${{ secrets.LIQUIBASE_PRO_LICENSE_KEY }} flow validate \
              --flow-file=${{ env.FLOW_FILE }} \
              --logfile=logs/liquibase.log
       #
