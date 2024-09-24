@@ -129,7 +129,7 @@ jobs:
       # Validate parseability of the Flow file
       - name: Validate flow
         run: |
-          liquibase --license-key=${{ env.LIQUIBASE_PRO_LICENSE_KEY }} flow validate \
+          liquibase --license-key=${{ secrets.LIQUIBASE_PRO_LICENSE_KEY }} flow validate \
              --flow-file=${{ env.FLOW_FILE }} \
              --logfile=logs/liquibase.log
       #
