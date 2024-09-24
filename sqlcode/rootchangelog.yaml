@@ -9,4 +9,3 @@ databaseChangeLog:
 # - include:
 #     file: schema3/schema3changelog.yaml
 #     relativeToChangelogFile: true
-
