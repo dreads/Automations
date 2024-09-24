@@ -56,7 +56,7 @@ env:
   #  LIQUIBASE_SEARCH_PATH: src/main/resources/changelogs
 
   #  The database changelog. See https://docs.liquibase.com/concepts/changelogs/working-with-changelogs.html
-  LIQUIBASE_COMMAND_CHANGELOG_FILE: "root_changelog.xml"
+  LIQUIBASE_COMMAND_CHANGELOG_FILE: "sqlcode/rootchangelog.yaml"
 
   #  Location of the Quality Checks settings file
   LIQUIBASE_COMMAND_CHECKS_SETTINGS_FILE: ${{ vars.LIQUIBASE_COMMAND_CHECKS_SETTINGS_FILE }}
