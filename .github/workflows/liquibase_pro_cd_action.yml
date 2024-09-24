@@ -15,7 +15,7 @@ on:
 #####################################################################
 env:
 #  The top level Flow File that orchestrates the database changes
-  FLOW_FILE: "liquibase-process/liquibase-postmerge.flowfile.yaml"
+  FLOW_FILE: "liquibase-process/flowfiles/liquibase-postmerge.flowfile.yaml"
 
 #  Search path (See https://docs.liquibase.com/concepts/changelogs/how-liquibase-finds-files.html)
 #  LIQUIBASE_SEARCH_PATH: src/main/resources/changelogs
@@ -24,7 +24,7 @@ env:
   LIQUIBASE_COMMAND_CHANGELOG_FILE: "root_changelog.xml"
 
 #  Location of the Quality Checks settings file
-  LIQUIBASE_COMMAND_CHECKS_SETTINGS_FILE: "liquibase-process/liquibase.checks-settings.conf"
+  LIQUIBASE_COMMAND_CHECKS_SETTINGS_FILE: "liquibase-process/policychecks/liquibase.checks-settings.conf"
 
 #  Pro License key
 #  See https://docs.liquibase.com/workflows/liquibase-pro/how-to-apply-your-liquibase-pro-license-key.html
