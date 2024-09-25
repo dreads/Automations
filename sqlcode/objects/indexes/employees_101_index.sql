@@ -1,0 +1,1 @@
+CREATE INDEX index_employees_101 ON dbo.employees_101 (name);

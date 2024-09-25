@@ -40,7 +40,7 @@ env:
   LIQUIBASE_SEARCH_PATH: ".,liquibase-process"
 
   #  The database changelog. See https://docs.liquibase.com/concepts/changelogs/working-with-changelogs.html
-  LIQUIBASE_COMMAND_CHANGELOG_FILE: "sqlcode/rootchangelog.yaml"
+  # LIQUIBASE_COMMAND_CHANGELOG_FILE: "sqlcode/rootchangelog.yaml"
 
   #  Location of the Quality Checks settings file
   LIQUIBASE_COMMAND_CHECKS_SETTINGS_FILE: "liquibase-process/policychecks/liquibase.checks-settings.conf"
