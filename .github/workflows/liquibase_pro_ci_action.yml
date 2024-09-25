@@ -3,7 +3,7 @@
 #  changes using Liquibase Pro
 #####################################################################
 name: 'Liquibase Pro CI Workflow'
-run-name: CI of ${{github.ref}} to ${{github.base_ref}} by ${{ github.actor }}
+run-name: Continuous Integration of ${{github.ref}} to ${{github.base_ref}} by ${{ github.actor }}
 
 # This workflow will execute whenever a pull request' is opened against
 # the 'develop' branch. When this workflow executes, it will execute
