@@ -1,0 +1,1 @@
+DROP FUNCTION ${AIA_UAT_SCHEMA_NAME}.fn_diagramobjects;
