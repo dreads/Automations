@@ -1,9 +1,9 @@
 #####################################################################
 #  GitHub Action to perform continuous integration (CI) of database
-#  changes using Liquibase Pro, Liquibase Pro Flows, Custom Quality
-#  checks and S3.
+#  changes using Liquibase Pro, Liquibase Pro Flows, and Custom
+#  Policy checks.
 #####################################################################
-name: 'Liquibase Pro Targeted Deployment'
+name: 'Liquibase Pro Targeted Deployment Workflow'
 run-name: Liquibase Pro Targeted Deployment of ${{ inputs.artifact-version }} to ${{ inputs.environment }} by ${{ github.actor }}
 
 on:
@@ -76,7 +76,7 @@ jobs:
   #  Initialization
   ####################################################################
   init:
-#    if: inputs.environment != 'DEV'
+    name: Initialization
     runs-on: [self-hosted]
     outputs:
       environment: ${{ steps.set-environment.outputs.environment }}
@@ -101,6 +101,7 @@ jobs:
   #  Check out the source code
   ####################################################################
   checkout-repo:
+    name: Check out repositories
     needs: [init]
     # Our database runs on Liquibase internal network, so we use a self-hosted runner
     # https://docs.github.com/en/actions/using-github-hosted-runners/connecting-to-a-private-network
