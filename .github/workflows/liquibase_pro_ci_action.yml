@@ -127,7 +127,7 @@ jobs:
   #  in the flowfile. In this case, run the checks.
   #####################################################################
   liquibase-checks:
-    name: Liquibase Custom Policy Checks
+    name: Custom Policy Checks
     needs: [checkout-repo, init]
     runs-on: [self-hosted]
 

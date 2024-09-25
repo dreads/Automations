@@ -4,7 +4,7 @@
 #  Policy checks.
 #####################################################################
 name: 'Liquibase Pro CD Workflow'
-run-name: CD of branch ${{github.ref}} by ${{ github.actor }}
+run-name: Continuous Deployment of ${{github.ref}} by ${{ github.actor }}
 
 # This workflow will execute whenever a 'push' event occurs on the
 # 'develop' branch. A push event can occur due to several events,
@@ -98,6 +98,7 @@ jobs:
   # This informational job runs in parallel with the checkout-repo job.
   ####################################################################
   print-environment:
+    name: Environment information
     runs-on: [self-hosted]
     needs: [init]
     steps:
@@ -130,7 +131,7 @@ jobs:
   #  in the flowfile.
   #####################################################################
   liquibase-deployment:
-    name: Liquibase Deployment
+    name: Database Deployment
     needs: [checkout-repo, init]
     runs-on: [self-hosted]
 
