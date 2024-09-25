@@ -17,6 +17,8 @@ on:
     types: [opened, reopened, synchronize]
     branches:
       - 'develop'
+      - 'qa'
+      - 'release/**'
 
 #####################################################################
 #  Set up the environment
