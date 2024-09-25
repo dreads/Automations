@@ -3,8 +3,8 @@
 #  changes using Liquibase Pro, Liquibase Pro Flows, and Custom
 #  Policy checks.
 #####################################################################
-name: 'Liquibase Pro Targeted Deployment Workflow'
-run-name: Targeted Deployment of ${{github.ref}} to ${{ inputs.environment }} by ${{ github.actor }}
+name: 'Liquibase Pro Deployment Workflow'
+run-name: Deployment of ${{github.ref}} to ${{ inputs.environment }} by ${{ github.actor }}
 
 on:
   workflow_dispatch:
