@@ -3,7 +3,7 @@
 #  changes using Liquibase Pro
 #####################################################################
 name: 'Liquibase Pro CI Workflow'
-run-name: CI of ${{github.ref}} merge to ${{github.base_ref}} by ${{ github.actor }}
+run-name: CI of ${{github.ref}} to ${{github.base_ref}} by ${{ github.actor }}
 
 # This workflow will execute whenever a pull request' is opened against
 # the 'develop' branch. When this workflow executes, it will execute
@@ -93,6 +93,7 @@ jobs:
   # This informational job runs in parallel with the checkout-repo job.
   ####################################################################
   print-environment:
+    name: Environment information
     runs-on: [self-hosted]
     needs: [init]
     steps:
@@ -123,9 +124,10 @@ jobs:
 
   ####################################################################
   #  Perform the Database change control operations specified
-  #  in the flowfile.
+  #  in the flowfile. In this case, run the checks.
   #####################################################################
   liquibase-checks:
+    name: Liquibase Custom Policy Checks
     needs: [checkout-repo, init]
     runs-on: [self-hosted]
 
