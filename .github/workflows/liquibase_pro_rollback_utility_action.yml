@@ -1,19 +1,33 @@
-####################################################################
-#  GitHub Action to perform a configurable, environment-targeted
-#  rollback of database changes.
+#####################################################################
+#  GitHub Action to perform a rollback of the previous update by
+#  executing the flowfiles/liquibase-rollback.flowfile.yaml from
+#  the adeelmalik78/Automations repository.
+#
+#  This workflow uses a workflow_dispatch trigger, and only allows
+#  for manual execution. To run the workflow:
+#  1. Go to the "Actions" tab of the repository.
+#  2. Select the Liquibase Pro Rollback Utility.
+#  3. Select the "Run Workflow button".
+#  4. In the popup enter the appropriate
+#     values below and click the "Run Workflow":
+#       -"Use workflow from" -> select the appropriate branch
+#       -"Environment" -> enter the environment to rollback
+#       -"Liquibase log level" -> INFO is chosen by default.
+#                                 Increase the log level if needed.
+#
 #####################################################################
 name: 'Liquibase Pro Rollback Utility'
-run-name: ${{ inputs.environment }} '${{ inputs.command }} ${{ inputs.command-arguments }}' by ${{ github.actor }}
+run-name: Rollback one update from ${{ inputs.environment }} using branch ${{github.ref}} by ${{ github.actor }}
 
 on:
 
   workflow_dispatch:
     inputs:
-      # The type 'environment' will automatically pull in the environments create in GitHub
+      # The type 'environment' will automatically pull in the environments created in Settings->Environments
       environment:
         description: 'Environment:'
         type: environment
-        default: develop
+        default: 'DEV'
         required: true
       # For more info on log level, see: https://docs.liquibase.com/parameters/log-level.html
       log-level:
