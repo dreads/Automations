@@ -46,25 +46,31 @@ env:
   #  rollback-one-update: https://docs.liquibase.com/commands/rollback/rollback-one-update.html
   FLOW_FILE: "liquibase-process/flowfiles/liquibase-rollback.flowfile.yaml"
 
-  #  Search path (See https://docs.liquibase.com/concepts/changelogs/how-liquibase-finds-files.html)
-  LIQUIBASE_SEARCH_PATH: ".,liquibase-process"
+  # The Liquibase Search Path controls how Liquibase finds it's configurations.
+  # To ensure the correct config gets located first, keep "." at the end of this path.
+  # See https://docs.liquibase.com/concepts/changelogs/how-liquibase-finds-files.html
+  LIQUIBASE_SEARCH_PATH: "liquibase-process,."
 
-  #  Pro License key
-  #  See https://docs.liquibase.com/workflows/liquibase-pro/how-to-apply-your-liquibase-pro-license-key.html
+  # Store the Liquibase Pro License key in a Github Action Repository Secret. The
+  # same license key is used for all executions, so it is tracked at the repository level
+  # See https://docs.liquibase.com/workflows/liquibase-pro/how-to-apply-your-liquibase-pro-license-key.html
   LIQUIBASE_LICENSE_KEY: ${{ secrets.LIQUIBASE_PRO_LICENSE_KEY }}
 
-  #  JDBC URL of the database per environment
-  #  See https://docs.liquibase.com/workflows/liquibase-community/using-jdbc-url-in-liquibase.html
+  # JDBC URL of the database per environment. Based on the incoming branch (one of DEV, QA, or PROD),
+  # the corresponding secret will be taken from the Environment secrets.
+  # See https://docs.liquibase.com/workflows/liquibase-community/using-jdbc-url-in-liquibase.html
   LIQUIBASE_COMMAND_URL: ${{ secrets.LIQUIBASE_COMMAND_URL }}
 
-  #  Credentials for the environment's database https://docs.liquibase.com/parameters/command-parameters.html
+  # Credentials for the environment's database. Based on the incoming branch (one of DEV, QA, or PROD),
+  # the corresponding secrets will be taken from the Environment secrets.
+  # See https://docs.liquibase.com/parameters/command-parameters.html
   LIQUIBASE_COMMAND_USERNAME: ${{ secrets.LIQUIBASE_COMMAND_USERNAME }}
   LIQUIBASE_COMMAND_PASSWORD: ${{ secrets.LIQUIBASE_COMMAND_PASSWORD }}
-  #
-  #  Logging Settings
+
+  # Logging Settings
+  # See https://docs.liquibase.com/parameters/log-format.html
   LIQUIBASE_LOG_FORMAT: JSON
   LIQUIBASE_LOG_LEVEL: INFO
-
 
 jobs:
   ####################################################################
@@ -75,12 +81,17 @@ jobs:
     runs-on: [ self-hosted ]
     outputs:
       environment: ${{ steps.set-environment.outputs.environment }}
+
     steps:
+      # Cancel any previous runs that are not completed for this workflow
       - name: Cancel previous workflow
         uses: styfle/cancel-workflow-action@0.12.1
         with:
           access_token: ${{ github.token }}
 
+      # Determine the environment based on the branch(es) that triggered this workflow.
+      # Output "DEV", "QA", or "PROD" to $GITHUB_OUTPUT where job output parameters are
+      # shared between jobs.
       - name: Set Environment
         id: set-environment
         run: |

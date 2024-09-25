@@ -1,6 +1,7 @@
-####################################################################
+#####################################################################
 #  GitHub Action to perform continuous integration (CI) of database
-#  changes using Liquibase Pro
+#  changes using Liquibase Pro, Liquibase Pro Flows, and Custom
+#  Policy checks.
 #####################################################################
 name: 'Liquibase Pro CI Workflow'
 run-name: Continuous Integration of ${{github.ref}} to ${{github.base_ref}} by ${{ github.actor }}
@@ -17,14 +18,14 @@ on:
     branches:
       - 'develop'
 
-####################################################################
+#####################################################################
 #  Set up the environment
 #####################################################################
 env:
   # The top level Flow File that gets cloned into the workspace from
   # the Liquibase Configuration Repo which orchestrates the database changes.
   # See https://docs.liquibase.com/commands/flow/flow.html
-  FLOW_FILE: "liquibase-process/flowfiles/liquibase-premerge.flowfile.yaml"
+  FLOW_FILE: "flowfiles/liquibase-premerge.flowfile.yaml"
 
   # The Liquibase Search Path controls how Liquibase finds it's configurations.
   # To ensure the correct config gets located first, keep "." at the end of this path.
