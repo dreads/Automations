@@ -1,0 +1,1 @@
+DROP PROCEDURE [${AIA_UAT_SCHEMA_NAME}].[CustOrdersOrders];
