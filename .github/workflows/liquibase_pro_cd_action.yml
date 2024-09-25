@@ -106,7 +106,7 @@ jobs:
           ENVIRONMENT: ${{needs.init.outputs.environment}}
         run: echo "The $ENVIRONMENT environment was selected."
 
-  ###################################################################
+  ####################################################################
   #  Check out the source code and configuration
   ####################################################################
   checkout-repo:
@@ -126,7 +126,7 @@ jobs:
           repository: adeelmalik78/Automations
           path: liquibase-process
 
-  ####################################################################
+  #####################################################################
   #  Perform the Database change control operations specified
   #  in the flowfile.
   #####################################################################
