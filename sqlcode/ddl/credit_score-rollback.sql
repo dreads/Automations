@@ -1,0 +1,1 @@
+DROP TABLE ${SALES_SCHEMA_NAME}.credit_score;

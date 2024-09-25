@@ -1,0 +1,2 @@
+-- Bad SQL
+DROP TABLE ${SALES_SCHEMA_NAME}.fruit;
