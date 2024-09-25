@@ -1,26 +1,20 @@
 #####################################################################
-#  GitHub Action to perform continuous integration (CI) of database
-#  changes using Liquibase Pro, Liquibase Pro Flows, Custom Quality
-#  checks and S3.
+#  GitHub Action to perform manual deployment of database
+#  changes using Liquibase Pro, Liquibase Pro Flows, and Custom
+#  Policy checks.
 #####################################################################
-name: 'Liquibase Pro Targeted Deployment'
-run-name: Liquibase Pro Targeted Deployment of ${{ inputs.artifact-version }} to ${{ inputs.environment }} by ${{ github.actor }}
+name: 'Liquibase Pro Targeted Deployment Workflow'
+run-name: Targeted Deployment of ${{github.ref}} to ${{ inputs.environment }} by ${{ github.actor }}
 
 on:
   workflow_dispatch:
-    # Following are the inputs received via the GitHubActions Run workflow dialog
+    # Following are the inputs received via the GitHub Actions Run workflow dialog
     inputs:
-      # The type 'environment' will automatically pull in the environments created in GitHub
+      # The type 'environment' will automatically pull in the environments created in Settings->Environments
       environment:
         description: 'Environment to deploy to'
         type: environment
         required: true
-      # This is a text input for the version of the artifact to pull from Artifactory
-      # and use for the deployment. The form is MMMMMMMMM.mm
-      artifact-version:
-        description: 'Version to deploy:'
-        required: true
-        type: string
       # For more info on log level, see: https://docs.liquibase.com/parameters/log-level.html
       log-level:
         description: 'Liquibase log level'
@@ -33,59 +27,62 @@ on:
 #  Set up the environment
 #####################################################################
 env:
-  #  The top level Flow File that orchestrates the database changes
-  FLOW_FILE: "liquibase-process/flowfiles/liquibase-premerge.flowfile.yaml"
+  # The top level Flow File that gets cloned into the workspace from
+  # the Liquibase Configuration Repo which orchestrates the database changes.
+  # See https://docs.liquibase.com/commands/flow/flow.html
+  FLOW_FILE: "flowfiles/liquibase-postmerge.flowfile.yaml"
 
-  #  Search path (See https://docs.liquibase.com/concepts/changelogs/how-liquibase-finds-files.html)
-  LIQUIBASE_SEARCH_PATH: ".,liquibase-process"
+  # The Liquibase Search Path controls how Liquibase finds it's configurations.
+  # To ensure the correct config gets located first, keep "." at the end of this path.
+  # See https://docs.liquibase.com/concepts/changelogs/how-liquibase-finds-files.html
+  LIQUIBASE_SEARCH_PATH: "liquibase-process,."
 
-  #  The database changelog. See https://docs.liquibase.com/concepts/changelogs/working-with-changelogs.html
-  LIQUIBASE_COMMAND_CHANGELOG_FILE: "sqlcode/rootchangelog.yaml"
+  # Location of the Custom Policy Checks settings file from the Liquibase Configuration Repo.
+  # See https://docs.liquibase.com/liquibase-pro/policy-checks/custom-policy-checks/home.html
+  LIQUIBASE_COMMAND_CHECKS_SETTINGS_FILE: "policychecks/liquibase.checks-settings.conf"
 
-  #  Location of the Quality Checks settings file
-  LIQUIBASE_COMMAND_CHECKS_SETTINGS_FILE: "liquibase-process/policychecks/liquibase.checks-settings.conf"
-
-  #  Pro License key
-  #  See https://docs.liquibase.com/workflows/liquibase-pro/how-to-apply-your-liquibase-pro-license-key.html
+  # Store the Liquibase Pro License key in a Github Action Repository Secret. The
+  # same license key is used for all executions, so it is tracked at the repository level
+  # See https://docs.liquibase.com/workflows/liquibase-pro/how-to-apply-your-liquibase-pro-license-key.html
   LIQUIBASE_LICENSE_KEY: ${{ secrets.LIQUIBASE_PRO_LICENSE_KEY }}
 
-  #  JDBC URL of the database per environment
-  #  See https://docs.liquibase.com/workflows/liquibase-community/using-jdbc-url-in-liquibase.html
+  # JDBC URL of the database per environment. Based on the incoming branch (one of DEV, QA, or PROD),
+  # the corresponding secret will be taken from the Environment secrets.
+  # See https://docs.liquibase.com/workflows/liquibase-community/using-jdbc-url-in-liquibase.html
   LIQUIBASE_COMMAND_URL: ${{ secrets.LIQUIBASE_COMMAND_URL }}
 
-  #  Credentials for the environment's database https://docs.liquibase.com/parameters/command-parameters.html
+  # Credentials for the environment's database. Based on the incoming branch (one of DEV, QA, or PROD),
+  # the corresponding secrets will be taken from the Environment secrets.
+  # See https://docs.liquibase.com/parameters/command-parameters.html
   LIQUIBASE_COMMAND_USERNAME: ${{ secrets.LIQUIBASE_COMMAND_USERNAME }}
   LIQUIBASE_COMMAND_PASSWORD: ${{ secrets.LIQUIBASE_COMMAND_PASSWORD }}
-  #
-  #  Logging Settings
+
+  # Logging Settings
+  # See https://docs.liquibase.com/parameters/log-format.html
   LIQUIBASE_LOG_FORMAT: JSON
   LIQUIBASE_LOG_LEVEL: INFO
 
-  # AWS S3 bucket is the host part of the S3 bucket
-  AWS_S3_BUCKET: ${{ vars.AWS_S3_BUCKET }}
-  # AWS Access credentials use by the Liquibase Pro S3 Extension
-  AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-  AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-  AWS_SESSION_TOKEN: ${{ secrets.AWS_SESSION_TOKEN }}
-
-  # Default AWS region
-  AWS_REGION: us-east-1
-
 jobs:
   ####################################################################
-  #  Initialization
+  # Initialization runs first because it has no 'needs' value.
   ####################################################################
   init:
-#    if: inputs.environment != 'DEV'
+    name: Initialization
+    # This runs on a self-hosted runner with Liquibase preinstalled.
     runs-on: [self-hosted]
     outputs:
       environment: ${{ steps.set-environment.outputs.environment }}
+
     steps:
+      # Cancel any previous runs that are not completed for this workflow
       - name: Cancel previous workflow
         uses: styfle/cancel-workflow-action@0.12.1
         with:
           access_token: ${{ github.token }}
 
+      # Determine the environment based on the branch(es) that triggered this workflow.
+      # Output "DEV", "QA", or "PROD" to $GITHUB_OUTPUT where job output parameters are
+      # shared between jobs.
       - name: Set Environment
         id: set-environment
         run: |
@@ -101,9 +98,8 @@ jobs:
   #  Check out the source code
   ####################################################################
   checkout-repo:
+    name: Check out repositories
     needs: [init]
-    # Our database runs on Liquibase internal network, so we use a self-hosted runner
-    # https://docs.github.com/en/actions/using-github-hosted-runners/connecting-to-a-private-network
     runs-on: [self-hosted]
 
     steps:
@@ -111,48 +107,25 @@ jobs:
       - name: Checkout Database Source repo
         uses: actions/checkout@v3
 
-      # Check out the Liquibase Configuration Repo
+      # Check out the Liquibase Configuration Repo to a folder, "liquibase-process"
       - name: Checkout Liquibase Configuration repo
         uses: actions/checkout@v4
         with:
           repository: adeelmalik78/Automations
           path: liquibase-process
-  ####################################################################
-  #  Extract the artifact
-  #####################################################################
-#  extract-artifact:
-#    if: ${{ inputs.environment}} == 'QA' || $${{ inputs.environment}} == 'PROD'
-#    runs-on: [self-hosted]
-#    needs: init
-#    steps:
-#
-#      - name: Download artifact
-#        run: |
-#          aws s3 cp s3://$AWS_S3_BUCKET/SNAPSHOT-artifact-${{inputs.artifact-version}}.zip .
-#
-#      # Unzip the artifact into the newly created ./artifact directory
-#      - name: Unzip artifact
-#        run: |
-#          unzip -o ./SNAPSHOT-artifact-${{inputs.artifact-version}}.zip
-
 
   ####################################################################
-  #  Perform Liquibase Pro database change control operations
+  #  Perform the Database change control operations specified
+  #  in the flowfile. In this case, deploy the database changes.
   #####################################################################
   liquibase-deployment:
+    name: Database Deployment
     needs: [init, checkout-repo]
     runs-on: [self-hosted]
 
     environment: ${{needs.init.outputs.environment}}
 
     steps:
-      # Validate parseability of the Flow file
-      - name: Validate flow
-        run: |
-          liquibase --license-key=${{ secrets.LIQUIBASE_PRO_LICENSE_KEY }} flow validate \
-             --flow-file=${{ env.FLOW_FILE }} \
-             --logfile=logs/liquibase.log
-      #
       # Execute the Flow file
       - name: Run flow
         run: |
