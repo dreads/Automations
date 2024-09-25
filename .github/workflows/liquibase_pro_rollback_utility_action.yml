@@ -16,7 +16,7 @@
 #                                 Increase the log level if needed.
 #
 #####################################################################
-name: 'Liquibase Pro Rollback Utility'
+name: 'Liquibase Pro Rollback One Update Workflow'
 run-name: Rollback one update from ${{ inputs.environment }} using branch ${{github.ref}} by ${{ github.actor }}
 
 on:
@@ -71,6 +71,7 @@ jobs:
   #  Initialization
   ####################################################################
   init:
+    name: Initialization
     runs-on: [ self-hosted ]
     outputs:
       environment: ${{ steps.set-environment.outputs.environment }}
@@ -92,20 +93,20 @@ jobs:
           fi
 
   ###################################################################
-  #  Check out the source code
+  #  Check out the source code and configuration
   ####################################################################
   checkout-repo:
+    name: Check out repositories
     needs: [init]
-    # Our database runs on Liquibase internal network, so we use a self-hosted runner
-    # https://docs.github.com/en/actions/using-github-hosted-runners/connecting-to-a-private-network
+
     runs-on: [self-hosted]
 
     steps:
-      # Check out the source code
+      # Check out the source code to .
       - name: Checkout Database Source repo
         uses: actions/checkout@v3
 
-      # Check out the Liquibase Configuration Repo
+      # Check out the Liquibase Configuration Repo to a folder, "liquibase-process"
       - name: Checkout Liquibase Configuration repo
         uses: actions/checkout@v4
         with:
@@ -113,22 +114,16 @@ jobs:
           path: liquibase-process
 
   #########################################################################
-  #  Roll back using the changelog from the artifact
+  #  Roll back
   #########################################################################
   liquibase-rollback-action:
+    name: Roll back one Liquibase update
     runs-on: [self-hosted]
     needs: [checkout-repo, init]
 
     environment: ${{ inputs.environment }}
 
     steps:
-      # Validate parseability of the Flow file
-      - name: Validate flow
-        run: |
-          liquibase --license-key=${{ secrets.LIQUIBASE_LICENSE_KEY }} flow validate \
-             --flow-file=${{ env.FLOW_FILE }} \
-             --logfile=logs/liquibase.log
-
       # Execute the Flow file
       - name: Run flow
         run: |
