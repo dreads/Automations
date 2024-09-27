@@ -35,8 +35,6 @@ resources:
     - repository: SRC_REPOSITORY
       name: $(Git.SrcRepository)
       type: GitHub
-      connection: liquibase
-      endpoint: liquibase
       source: dreads/Automation-Examples
       ref: 'refs/heads/develop'
 
