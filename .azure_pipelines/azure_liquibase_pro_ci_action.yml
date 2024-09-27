@@ -33,7 +33,7 @@ resources:
 
     # Repository for the Tools Project, which includes flows and policies
     - repository: SRC_REPOSITORY
-      name: $(Git.ConfigRepository)
+      name: $(Git.SrcRepository)
       type: GitHub
       connection: liquibase
       endpoint: liquibase
@@ -41,13 +41,13 @@ resources:
       ref: 'refs/heads/develop'
 
     # Repository for the Tools Project, which includes flows and policies
-    - repository: TOOLS_REPOSITORY
-      name: $(Git.ConfigRepository)
-      type: GitHub
-      connection: liquibase
-      endpoint: liquibase
-      source: adeelmalik78/Automations
-      ref: 'refs/heads/main'
+#    - repository: TOOLS_REPOSITORY
+#      name: $(Git.ConfigRepository)
+#      type: GitHub
+#      connection: liquibase
+#      endpoint: liquibase
+#      source: adeelmalik78/Automations
+#      ref: 'refs/heads/main'
 
 #stages:
 #  - stage: Run_CI
