@@ -35,6 +35,7 @@ resources:
     - repository: SRC_REPOSITORY
       name: $(Git.SrcRepository)
       type: GitHub
+      endpoint: github.com_dreads
       source: dreads/Automation-Examples
       ref: 'refs/heads/develop'
 
