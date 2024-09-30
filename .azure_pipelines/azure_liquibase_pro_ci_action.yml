@@ -71,7 +71,7 @@ stages:
           - script: |
               pwd
               du -ah
-              liquibase --defaults-file='./Automation-Examples/liquibase.properties' status
+              liquibase status
             displayName: Use DEV Keys
 #            condition: eq( variables['Build.SourceBranchName'], 'develop')
             env:
@@ -79,6 +79,7 @@ stages:
               LIQUIBASE_COMMAND_URL: $(Liquibase-command-url-dev)
               LIQUIBASE_COMMAND_USERNAME: $(liquibase-command-username-dev)
               LIQUIBASE_COMMAND_PASSWORD: $(liquibase-command-password-dev)
+              LIQUIBASE_DEFAULTS_FILE: ./Automation-Examples/liquibase.properties
               LIQUIBASE_SEARCH_PATH: "Automation-Examples,Automations,."
 
           - script: |
@@ -90,6 +91,7 @@ stages:
               LIQUIBASE_COMMAND_URL: $(liquibase-command-url-qa)
               LIQUIBASE_COMMAND_USERNAME: $(liquibase-command-username-qa)
               LIQUIBASE_COMMAND_PASSWORD: $(liquibase-command-password-qa)
+              LIQUIBASE_DEFAULTS_FILE: ./Automation-Examples/liquibase.properties
               LIQUIBASE_SEARCH_PATH: "Automation-Examples,Automations,."
 
           - script: |
@@ -101,6 +103,7 @@ stages:
               LIQUIBASE_COMMAND_URL: $(liquibase-command-url-prod)
               LIQUIBASE_COMMAND_USERNAME: $(liquibase-command-username-prod)
               LIQUIBASE_COMMAND_PASSWORD: $(liquibase-command-password-prod)
+              LIQUIBASE_DEFAULTS_FILE: ./Automation-Examples/liquibase.properties
               LIQUIBASE_SEARCH_PATH: "Automation-Examples,Automations,."
 
 #pr:
