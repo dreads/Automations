@@ -47,13 +47,6 @@ stages:
       - job:
         displayName: Test the license key
         steps:
-#          - checkout: SRC_REPOSITORY
-#            persistCredentials: true
-#            clean: true
-#
-#          - checkout: TOOLS_REPOSITORY
-#            persistCredentials: true
-#            clean: true
 
           - script: |
               whoami
@@ -76,14 +69,18 @@ stages:
             clean: true
 
           - script: |
-              whoami
-              du -ah
-              liquibase -version
-              echo $(System.DefaultWorkingDirectory)
-              echo $(Build.SourceBranchName)
+              liquibase -status
+            displayName: Use DEV Keys
+            condition: eq( variables['Build.SourceBranchName'], 'develop')
             env:
               LIQUIBASE_LICENSE_KEY: $(Liquibase-Pro-Key)
 
+          - script: |
+              liquibase -status
+            displayName: Use QA Keys
+            condition: eq( variables['Build.SourceBranchName'], 'qa')
+            env:
+              LIQUIBASE_LICENSE_KEY: $(Liquibase-Pro-Key)
 #
 #          # Compress files into .zip
 #          - task: ArchiveFiles@2
