@@ -1,12 +1,9 @@
-pr: none
-
-# TODO: Change to PR trigger
-trigger:
+pr:
   branches:
     include:
-      - '*'
+      - 'develop'
 
-name: $(Application.Name)-$(Build.BuildId)
+name: Continuous Integration of $(PullRequest.SourceBranch) to $(PullRequest.TargetBranch)
 
 # Use the Liquibase_Variables variable group to get credentials from Azure key vault
 # https://learn.microsoft.com/en-us/azure/devops/pipelines/library/variable-groups?view=azure-devops&tabs=yaml#use-a-variable-group
@@ -45,19 +42,6 @@ stages:
           clean: all
 
       - job:
-        displayName: Test the license key
-        steps:
-
-          - script: |
-              whoami
-              du -ah
-              liquibase -version
-              echo $(System.DefaultWorkingDirectory)
-              echo $(Build.SourceBranchName)
-            env:
-              LIQUIBASE_LICENSE_KEY: $(Liquibase-Pro-Key)
-
-      - job:
         displayName: Test the DB keys
         steps:
           - checkout: SRC_REPOSITORY
@@ -89,85 +73,27 @@ stages:
               LIQUIBASE_DEFAULTS_FILE: ./Automation-Examples/liquibase.properties
               LIQUIBASE_SEARCH_PATH: "Automation-Examples,Automations,."
 
-          - script: |
-              liquibase status
-            displayName: Use QA Keys
-            condition: eq( variables['Build.SourceBranchName'], 'qa')
-            env:
-              LIQUIBASE_LICENSE_KEY: $(Liquibase-Pro-Key)
-              LIQUIBASE_COMMAND_URL: $(liquibase-command-url-qa)
-              LIQUIBASE_COMMAND_USERNAME: $(liquibase-command-username-qa)
-              LIQUIBASE_COMMAND_PASSWORD: $(liquibase-command-password-qa)
-              LIQUIBASE_DEFAULTS_FILE: ./Automation-Examples/liquibase.properties
-              LIQUIBASE_SEARCH_PATH: "Automation-Examples,Automations,."
+#          - script: |
+#              liquibase status
+#            displayName: Use QA Keys
+#            condition: eq( variables['Build.SourceBranchName'], 'qa')
+#            env:
+#              LIQUIBASE_LICENSE_KEY: $(Liquibase-Pro-Key)
+#              LIQUIBASE_COMMAND_URL: $(liquibase-command-url-qa)
+#              LIQUIBASE_COMMAND_USERNAME: $(liquibase-command-username-qa)
+#              LIQUIBASE_COMMAND_PASSWORD: $(liquibase-command-password-qa)
+#              LIQUIBASE_DEFAULTS_FILE: ./Automation-Examples/liquibase.properties
+#              LIQUIBASE_SEARCH_PATH: "Automation-Examples,Automations,."
 
-          - script: |
-              liquibase status
-            displayName: Use PROD Keys
-            condition: eq( variables['Build.SourceBranchName'], 'prod')
-            env:
-              LIQUIBASE_LICENSE_KEY: $(Liquibase-Pro-Key)
-              LIQUIBASE_COMMAND_URL: $(liquibase-command-url-prod)
-              LIQUIBASE_COMMAND_USERNAME: $(liquibase-command-username-prod)
-              LIQUIBASE_COMMAND_PASSWORD: $(liquibase-command-password-prod)
-              LIQUIBASE_DEFAULTS_FILE: ./Automation-Examples/liquibase.properties
-              LIQUIBASE_SEARCH_PATH: "Automation-Examples,Automations,."
+#          - script: |
+#              liquibase status
+#            displayName: Use PROD Keys
+#            condition: eq( variables['Build.SourceBranchName'], 'prod')
+#            env:
+#              LIQUIBASE_LICENSE_KEY: $(Liquibase-Pro-Key)
+#              LIQUIBASE_COMMAND_URL: $(liquibase-command-url-prod)
+#              LIQUIBASE_COMMAND_USERNAME: $(liquibase-command-username-prod)
+#              LIQUIBASE_COMMAND_PASSWORD: $(liquibase-command-password-prod)
+#              LIQUIBASE_DEFAULTS_FILE: ./Automation-Examples/liquibase.properties
+#              LIQUIBASE_SEARCH_PATH: "Automation-Examples,Automations,."
 
-#pr:
-#  branches:
-#    include:
-#      - 'develop'
-#      - 'qa'
-#      - 'release/**'
-#
-#name: Continuous Integration of $(Application.Name)-$(Build.BuildId)
-#
-#variables:
-#  - template: variables.yml
-#  - group: Liquibase_Variables
-#
-## See https://dev.azure.com/rbowser0322/ -> Organization Settings -> Pipelines -> Agent Pools
-#pool:
-#  name: $(Agent.PoolName)
-#
-## Delete the entire Pipeline.Workspace directory before running a new job.
-#workspace:
-#  clean: all
-#
-## Build using Github repositories
-## See https://learn.microsoft.com/en-us/azure/devops/pipelines/repos/github?view=azure-devops
-#resources:
-#  repositories:
-#  # Repository for the Tools Project, which includes flows and policies
-#  - repository: SRC_REPOSITORY
-#    name: $(Git.SrcRepository)
-#    type: GitHub
-#    endpoint: github.com_dreads
-#    source: dreads/Automation-Examples
-#    ref: 'refs/heads/develop'
-## Repository for the Tools Project, which includes flows and policies
-##    - repository: TOOLS_REPOSITORY
-##      name: $(Git.ConfigRepository)
-##      type: GitHub
-##      connection: liquibase
-##      endpoint: liquibase
-##      source: adeelmalik78/Automations
-##      ref: 'refs/heads/main'
-#
-#
-#jobs:
-#  - job:
-#    workspace:
-#      clean: all
-##  - job:
-##    displayName: 'Custom Policy Checks - Azure DevOps'
-##    steps:
-##          - checkout: TOOLS_REPOSITORY
-##            persistCredentials: true
-##            clean: true
-#
-#          # Ensure the PATH includes the necessary executables, eg. hammer and sqlplus/sqlcmd/clpplus/psql
-#          # Also copy the Rules from the Centralized rules folder to the DDB folder
-##        - script: |
-##            pwd
-##            whoami
