@@ -7,6 +7,7 @@ pr:
 
 name: Continuous Integration of $(Application.Name)-$(Build.BuildId)
 
+
 variables:
   - name: branchname
     value: $[replace(variables['Build.SourceBranch'], 'refs/heads/', '')]
@@ -28,16 +29,14 @@ workspace:
 # See https://learn.microsoft.com/en-us/azure/devops/pipelines/repos/github?view=azure-devops
 resources:
   repositories:
-
-    # Repository for the Tools Project, which includes flows and policies
-    - repository: SRC_REPOSITORY
-      name: $(Git.SrcRepository)
-      type: GitHub
-      endpoint: github.com_dreads
-      source: dreads/Automation-Examples
-      ref: 'refs/heads/develop'
-
-    # Repository for the Tools Project, which includes flows and policies
+  # Repository for the Tools Project, which includes flows and policies
+  - repository: SRC_REPOSITORY
+    name: $(Git.SrcRepository)
+    type: GitHub
+    endpoint: github.com_dreads
+    source: dreads/Automation-Examples
+    ref: 'refs/heads/develop'
+# Repository for the Tools Project, which includes flows and policies
 #    - repository: TOOLS_REPOSITORY
 #      name: $(Git.ConfigRepository)
 #      type: GitHub
@@ -45,25 +44,24 @@ resources:
 #      endpoint: liquibase
 #      source: adeelmalik78/Automations
 #      ref: 'refs/heads/main'
-
-#stages:
-#  - stage: Run_CI
-#    condition: true
-#    lockBehavior: sequential
-#    # Check out the code to the runner workspace directory
-#    jobs:
-#      - job:
-#        workspace:
-#          clean: all
-#      - job:
-#        displayName: 'Run Liquibase packager'
-#        steps:
+stages:
+- stage: Run_CI
+  condition: true
+  lockBehavior: sequential
+  # Check out the code to the runner workspace directory
+  jobs:
+  - job:
+    workspace:
+      clean: all
+  - job:
+    displayName: 'Custom Policy Checks - Azure DevOps'
+    steps:
 #          - checkout: TOOLS_REPOSITORY
 #            persistCredentials: true
 #            clean: true
-#
-#            # Ensure the PATH includes the necessary executables, eg. hammer and sqlplus/sqlcmd/clpplus/psql
-#            # Also copy the Rules from the Centralized rules folder to the DDB folder
-#          - script: |
-#              pwd
-#              whoami
+
+          # Ensure the PATH includes the necessary executables, eg. hammer and sqlplus/sqlcmd/clpplus/psql
+          # Also copy the Rules from the Centralized rules folder to the DDB folder
+        - script: |
+            pwd
+            whoami
