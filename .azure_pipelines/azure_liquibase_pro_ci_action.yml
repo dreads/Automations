@@ -49,20 +49,23 @@ stages:
       - job:
         workspace:
           clean: all
-#      - job:
-#        displayName: Build (Deploy to Dev)
-#        steps:
-#          - checkout: LB_REPOSITORY
-#            persistCredentials: true
-#            clean: true
-#
-#          - script: |
-#              whoami
-#              liquibase -version
-#              echo $(System.DefaultWorkingDirectory)
-#              echo $(Build.SourceBranchName)
-#              liquibase flow --flow-file=flows/liquibase-build.flowfile.yaml
-#              if [ $? -ne 0 ]; then exit 1; fi
+      - job:
+        displayName: Custom Policy Checks
+        steps:
+          - checkout: SRC_REPOSITORY
+            persistCredentials: true
+            clean: true
+
+          - checkout: TOOLS_REPOSITORY
+            persistCredentials: true
+            clean: true
+
+          - script: |
+              whoami
+              du -ah
+              liquibase -version
+              echo $(System.DefaultWorkingDirectory)
+              echo $(Build.SourceBranchName)
 #            env:
 #              LIQUIBASE_COMMAND_URL: $(Liquibase-LB-Postgres-Dev-Url)
 #              LIQUIBASE_COMMAND_USERNAME: $(Liquibase-LB-Postgres-Username)
