@@ -69,11 +69,16 @@ stages:
             clean: true
 
           - script: |
+              pwd
+              du -ah
               liquibase status
             displayName: Use DEV Keys
             condition: eq( variables['Build.SourceBranchName'], 'develop')
             env:
               LIQUIBASE_LICENSE_KEY: $(Liquibase-Pro-Key)
+              LIQUIBASE_COMMAND_URL: $(liquibase-command-url-dev)
+              LIQUIBASE_COMMAND_USERNAME: $(liquibase-command-username-dev)
+              LIQUIBASE_COMMAND_PASSWORD: $(liquibase-command-password-dev)
 
           - script: |
               liquibase status
@@ -81,66 +86,19 @@ stages:
             condition: eq( variables['Build.SourceBranchName'], 'qa')
             env:
               LIQUIBASE_LICENSE_KEY: $(Liquibase-Pro-Key)
-#
-#          # Compress files into .zip
-#          - task: ArchiveFiles@2
-#            condition: always()
-#            inputs:
-#              rootFolderOrFile: '$(System.DefaultWorkingDirectory)'
-#              includeRootFolder: true
-#              archiveType: 'zip'
-#              archiveFile: '$(System.DefaultWorkingDirectory)/artifacts/$(Application.Name)-$(Build.BuildId).zip'
-#
-#          # If using Azure Artifacts
-#          - upload: $(System.DefaultWorkingDirectory)/artifacts/$(Application.Name)-$(Build.BuildId).zip
-#            artifact: $(Application.Name)
-#            condition: always()
+              LIQUIBASE_COMMAND_URL: $(liquibase-command-url-qa)
+              LIQUIBASE_COMMAND_USERNAME: $(liquibase-command-username-qa)
+              LIQUIBASE_COMMAND_PASSWORD: $(liquibase-command-password-qa)
 
-#  - stage: Deploy_to_Prod
-#    condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/main'))
-#    jobs:
-#      - deployment:
-#        displayName: Deploy to Prod
-#        environment: Postgres-prod
-#        strategy:
-#          runOnce:
-#            deploy:
-#              steps:
-#                - checkout: LB_REPOSITORY
-#                  persistCredentials: true
-#                  clean: true
-#
-#                - script: |
-#                    liquibase flow --flow-file=flows/liquibase-deploy.flowfile.yaml
-#                    if [ $? -ne 0 ]; then exit 1; fi
-#                  env:
-#                    LIQUIBASE_COMMAND_URL: $(Liquibase-LB-Postgres-Prod-Url)
-#                    LIQUIBASE_COMMAND_USERNAME: $(Liquibase-LB-Postgres-Username)
-#                    LIQUIBASE_COMMAND_PASSWORD: $(Liquibase-LB-Postgres-Password)
-#                    LIQUIBASE_LICENSE_KEY: $(Liquibase-Pro-Key)
-#                    LB_FLOW_DIR: flows
-#                    LB_FLOW_ENV: PROD
-#                    AWS_S3_BUCKET: asmith-s3-extension-demo
-#                    AWS_ACCESS_KEY_ID: $(Liquibase-LB-AWS-ACCESS-KEY-ID)
-#                    AWS_SECRET_ACCESS_KEY: $(Liquibase-LB-AWS-SECRET-ACCESS-KEY)
-#                    AWS_REGION: us-east-1
-#                  displayName: Deploy
-#
-#                # Compress files into .zip
-#                - task: ArchiveFiles@2
-#                  condition: and(succeeded(), eq( variables['Build.SourceBranchName'], 'main'))
-#                  inputs:
-#                    rootFolderOrFile: '$(System.DefaultWorkingDirectory)'
-#                    includeRootFolder: true
-#                    archiveType: 'zip'
-#                    archiveFile: '$(System.DefaultWorkingDirectory)/artifacts/$(Application.Name)-Deploy-$(Build.BuildId).zip'
-#
-#                # If using Azure Artifacts
-#                - upload: $(System.DefaultWorkingDirectory)/artifacts/$(Application.Name)-Deploy-$(Build.BuildId).zip
-#                  artifact: $(Application.Name)-Deploy
-#                  condition: and(succeeded(), eq( variables['Build.SourceBranchName'], 'main'))
-
-
+          - script: |
+              liquibase status
+            displayName: Use PROD Keys
+            condition: eq( variables['Build.SourceBranchName'], 'prod')
+            env:
+              LIQUIBASE_LICENSE_KEY: $(Liquibase-Pro-Key)
+              LIQUIBASE_COMMAND_URL: $(liquibase-command-url-prod)
+              LIQUIBASE_COMMAND_USERNAME: $(liquibase-command-username-prod)
+              LIQUIBASE_COMMAND_PASSWORD: $(liquibase-command-password-prod)
 
 #pr:
 #  branches:
