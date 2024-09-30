@@ -37,8 +37,7 @@ resources:
       endpoint: github.com_dreads
       source: dreads/Automation-Examples
       ref: 'refs/heads/develop'
-
-    # Repository for the Tools Project, which includes flows and policies
+# Repository for the Tools Project, which includes flows and policies
 #    - repository: TOOLS_REPOSITORY
 #      name: $(Git.ConfigRepository)
 #      type: GitHub
@@ -48,23 +47,23 @@ resources:
 #      ref: 'refs/heads/main'
 
 stages:
-  - stage: Run_CI
-    condition: true
-    lockBehavior: sequential
-    # Check out the code to the runner workspace directory
-    jobs:
-      - job:
-        workspace:
-          clean: all
-      - job:
-        displayName: 'Custom Policy Checks - Azure DevOps'
-        steps:
+- stage: Run_CI
+  condition: true
+  lockBehavior: sequential
+  # Check out the code to the runner workspace directory
+  jobs:
+  - job:
+    workspace:
+      clean: all
+  - job:
+    displayName: 'Custom Policy Checks - Azure DevOps'
+    steps:
 #          - checkout: TOOLS_REPOSITORY
 #            persistCredentials: true
 #            clean: true
 
-            # Ensure the PATH includes the necessary executables, eg. hammer and sqlplus/sqlcmd/clpplus/psql
-            # Also copy the Rules from the Centralized rules folder to the DDB folder
-          - script: |
-              pwd
-              whoami
+          # Ensure the PATH includes the necessary executables, eg. hammer and sqlplus/sqlcmd/clpplus/psql
+          # Also copy the Rules from the Centralized rules folder to the DDB folder
+        - script: |
+            pwd
+            whoami
