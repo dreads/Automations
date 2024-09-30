@@ -66,11 +66,11 @@ stages:
               liquibase -version
               echo $(System.DefaultWorkingDirectory)
               echo $(Build.SourceBranchName)
-#            env:
+            env:
 #              LIQUIBASE_COMMAND_URL: $(Liquibase-LB-Postgres-Dev-Url)
 #              LIQUIBASE_COMMAND_USERNAME: $(Liquibase-LB-Postgres-Username)
 #              LIQUIBASE_COMMAND_PASSWORD: $(Liquibase-LB-Postgres-Password)
-#              LIQUIBASE_LICENSE_KEY: $(Liquibase-Pro-Key)
+              LIQUIBASE_LICENSE_KEY: $(Liquibase-Pro-Key)
 #              LB_FLOW_DIR: flows
 #              LB_FLOW_ENV: DEV
 #            displayName: Liquibase Build
