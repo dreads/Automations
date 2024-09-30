@@ -68,12 +68,19 @@ stages:
             persistCredentials: true
             clean: true
 
+          - bash: |
+              echo "##vso[task.setvariable variable=FLOW_FILE;]flowfiles/liquibase-premerge.flowfile.yaml"
+
           - script: |
               pwd
               du -ah
               liquibase status
+              liquibase flow \
+                 --flow-file=$(FLOW_FILE) \
+                 --logfile=logs/liquibase.log
+
             displayName: Use DEV Keys
-#            condition: eq( variables['Build.SourceBranchName'], 'develop')
+            condition: eq( variables['Build.SourceBranchName'], 'develop')
             env:
               LIQUIBASE_LICENSE_KEY: $(Liquibase-Pro-Key)
               LIQUIBASE_COMMAND_URL: $(Liquibase-command-url-dev)
@@ -85,7 +92,7 @@ stages:
           - script: |
               liquibase status
             displayName: Use QA Keys
-#            condition: eq( variables['Build.SourceBranchName'], 'qa')
+            condition: eq( variables['Build.SourceBranchName'], 'qa')
             env:
               LIQUIBASE_LICENSE_KEY: $(Liquibase-Pro-Key)
               LIQUIBASE_COMMAND_URL: $(liquibase-command-url-qa)
@@ -97,7 +104,7 @@ stages:
           - script: |
               liquibase status
             displayName: Use PROD Keys
-#            condition: eq( variables['Build.SourceBranchName'], 'prod')
+            condition: eq( variables['Build.SourceBranchName'], 'prod')
             env:
               LIQUIBASE_LICENSE_KEY: $(Liquibase-Pro-Key)
               LIQUIBASE_COMMAND_URL: $(liquibase-command-url-prod)
