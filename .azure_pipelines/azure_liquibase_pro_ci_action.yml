@@ -76,10 +76,9 @@ stages:
             condition: eq( variables['Build.SourceBranchName'], 'develop')
             env:
               LIQUIBASE_LICENSE_KEY: $(Liquibase-Pro-Key)
-              LIQUIBASE_COMMAND_URL: $(liquibase-command-url-dev)
+              LIQUIBASE_COMMAND_URL: $(Liquibase-Command-Url-Dev)
               LIQUIBASE_COMMAND_USERNAME: $(liquibase-command-username-dev)
               LIQUIBASE_COMMAND_PASSWORD: $(liquibase-command-password-dev)
-#              LIQUIBASE_SEARCH_PATH: "/Users/rbowser/code/Automation-Examples/,./Automation-Examples,./Automations,."
 
           - script: |
               liquibase status
