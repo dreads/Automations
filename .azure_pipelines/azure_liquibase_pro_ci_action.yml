@@ -76,7 +76,7 @@ stages:
             condition: eq( variables['Build.SourceBranchName'], 'develop')
             env:
               LIQUIBASE_LICENSE_KEY: $(Liquibase-Pro-Key)
-              LIQUIBASE_COMMAND_URL: $(Liquibase-Command-Url-Dev)
+              LIQUIBASE_COMMAND_URL: 'jdbc:oracle:thin:@//cs-oracledb.liquibase.net:1521/gha_lower'
               LIQUIBASE_COMMAND_USERNAME: $(liquibase-command-username-dev)
               LIQUIBASE_COMMAND_PASSWORD: $(liquibase-command-password-dev)
 
