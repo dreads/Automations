@@ -11,11 +11,6 @@ variables:
   - template: variables.yml
   - group: Liquibase_Variables
 
-# The pool used is "Motion Reference Agent Pool"
-# See https://dev.azure.com/rbowser0322/ -> Organization Settings -> Pipelines -> Agent Pools
-#pool:
-#  name: $(Agent.PoolName)
-
 # Delete the entire Pipeline.Workspace directory before running a new job.
 workspace:
   clean: all
@@ -43,21 +38,20 @@ resources:
 stages:
 - stage: Run_CI
   condition: true
-  lockBehavior: sequential
   # Check out the code to the runner workspace directory
   jobs:
   - job:
     workspace:
       clean: all
-  - job:
-    displayName: 'Custom Policy Checks - Azure DevOps'
-    steps:
+#  - job:
+#    displayName: 'Custom Policy Checks - Azure DevOps'
+#    steps:
 #          - checkout: TOOLS_REPOSITORY
 #            persistCredentials: true
 #            clean: true
 
           # Ensure the PATH includes the necessary executables, eg. hammer and sqlplus/sqlcmd/clpplus/psql
           # Also copy the Rules from the Centralized rules folder to the DDB folder
-        - script: |
-            pwd
-            whoami
+#        - script: |
+#            pwd
+#            whoami
