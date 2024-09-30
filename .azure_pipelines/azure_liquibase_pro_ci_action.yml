@@ -11,9 +11,13 @@ variables:
   - template: variables.yml
   - group: Liquibase_Variables
 
+# See https://dev.azure.com/rbowser0322/ -> Organization Settings -> Pipelines -> Agent Pools
+pool:
+  name: $(Agent.PoolName)
+
 # Delete the entire Pipeline.Workspace directory before running a new job.
-#workspace:
-#  clean: all
+workspace:
+  clean: all
 
 # Build using Github repositories
 # See https://learn.microsoft.com/en-us/azure/devops/pipelines/repos/github?view=azure-devops
