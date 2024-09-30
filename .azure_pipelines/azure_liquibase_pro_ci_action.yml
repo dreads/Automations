@@ -1,6 +1,4 @@
-pr: none
-
-trigger:
+pr:
   branches:
     include:
       - 'develop'
