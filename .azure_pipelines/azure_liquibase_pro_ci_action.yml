@@ -37,7 +37,7 @@ resources:
       ref: 'refs/heads/main'
 
 stages:
-  - stage: Continuous Integration to DEV
+  - stage: CI_DEV
     # Check out the code to the runner workspace directory
     jobs:
       - job:
