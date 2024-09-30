@@ -7,12 +7,7 @@ pr:
 
 name: Continuous Integration of $(Application.Name)-$(Build.BuildId)
 
-
 variables:
-  - name: branchname
-    value: $[replace(variables['Build.SourceBranch'], 'refs/heads/', '')]
-  - name: labels_branchname
-    value: $[replace(variables['branchname'], '/','_')]
   - template: variables.yml
   - group: Liquibase_Variables
 
@@ -44,6 +39,7 @@ resources:
 #      endpoint: liquibase
 #      source: adeelmalik78/Automations
 #      ref: 'refs/heads/main'
+
 stages:
 - stage: Run_CI
   condition: true
