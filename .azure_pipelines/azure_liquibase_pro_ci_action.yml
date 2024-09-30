@@ -7,6 +7,7 @@ pr:
 
 name: Continuous Integration of $(Application.Name)-$(Build.BuildId)
 
+
 variables:
   - name: branchname
     value: $[replace(variables['Build.SourceBranch'], 'refs/heads/', '')]
