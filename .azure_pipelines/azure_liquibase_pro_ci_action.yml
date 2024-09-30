@@ -47,24 +47,24 @@ resources:
 #      source: adeelmalik78/Automations
 #      ref: 'refs/heads/main'
 
-#stages:
-#  - stage: Run_CI
-#    condition: true
-#    lockBehavior: sequential
-#    # Check out the code to the runner workspace directory
-#    jobs:
-#      - job:
-#        workspace:
-#          clean: all
-#      - job:
-#        displayName: 'Run Liquibase packager'
-#        steps:
+stages:
+  - stage: Run_CI
+    condition: true
+    lockBehavior: sequential
+    # Check out the code to the runner workspace directory
+    jobs:
+      - job:
+        workspace:
+          clean: all
+      - job:
+        displayName: 'Custom Policy Checks - Azure DevOps'
+        steps:
 #          - checkout: TOOLS_REPOSITORY
 #            persistCredentials: true
 #            clean: true
-#
-#            # Ensure the PATH includes the necessary executables, eg. hammer and sqlplus/sqlcmd/clpplus/psql
-#            # Also copy the Rules from the Centralized rules folder to the DDB folder
-#          - script: |
-#              pwd
-#              whoami
+
+            # Ensure the PATH includes the necessary executables, eg. hammer and sqlplus/sqlcmd/clpplus/psql
+            # Also copy the Rules from the Centralized rules folder to the DDB folder
+          - script: |
+              pwd
+              whoami
