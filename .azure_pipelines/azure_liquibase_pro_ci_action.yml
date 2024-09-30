@@ -20,11 +20,27 @@ pool:
 resources:
   repositories:
 
-    - repository: LB_REPOSITORY
-      name: LiquibasePro
-      type: git
-      connection: AzureRepos
-      source: LiquibasePro
+#    - repository: LB_REPOSITORY
+#      name: LiquibasePro
+#      type: git
+#      connection: AzureRepos
+#      source: LiquibasePro
+#      ref: 'refs/heads/main'
+
+    # Repository for the Tools Project, which includes flows and policies
+    - repository: SRC_REPOSITORY
+      name: $(Git.SrcRepository)
+      type: GitHub
+      endpoint: github.com_dreads
+      source: dreads/Automation-Examples
+      ref: 'refs/heads/develop'
+
+    - repository: TOOLS_REPOSITORY
+      name: $(Git.ConfigRepository)
+      type: GitHub
+      connection: liquibase
+      endpoint: liquibase
+      source: adeelmalik78/Automations
       ref: 'refs/heads/main'
 
 stages:
@@ -34,86 +50,86 @@ stages:
       - job:
         workspace:
           clean: all
-      - job:
-        displayName: Build (Deploy to Dev)
-        steps:
-          - checkout: LB_REPOSITORY
-            persistCredentials: true
-            clean: true
+#      - job:
+#        displayName: Build (Deploy to Dev)
+#        steps:
+#          - checkout: LB_REPOSITORY
+#            persistCredentials: true
+#            clean: true
+#
+#          - script: |
+#              whoami
+#              liquibase -version
+#              echo $(System.DefaultWorkingDirectory)
+#              echo $(Build.SourceBranchName)
+#              liquibase flow --flow-file=flows/liquibase-build.flowfile.yaml
+#              if [ $? -ne 0 ]; then exit 1; fi
+#            env:
+#              LIQUIBASE_COMMAND_URL: $(Liquibase-LB-Postgres-Dev-Url)
+#              LIQUIBASE_COMMAND_USERNAME: $(Liquibase-LB-Postgres-Username)
+#              LIQUIBASE_COMMAND_PASSWORD: $(Liquibase-LB-Postgres-Password)
+#              LIQUIBASE_LICENSE_KEY: $(Liquibase-Pro-Key)
+#              LB_FLOW_DIR: flows
+#              LB_FLOW_ENV: DEV
+#            displayName: Liquibase Build
+#
+#          # Compress files into .zip
+#          - task: ArchiveFiles@2
+#            condition: always()
+#            inputs:
+#              rootFolderOrFile: '$(System.DefaultWorkingDirectory)'
+#              includeRootFolder: true
+#              archiveType: 'zip'
+#              archiveFile: '$(System.DefaultWorkingDirectory)/artifacts/$(Application.Name)-$(Build.BuildId).zip'
+#
+#          # If using Azure Artifacts
+#          - upload: $(System.DefaultWorkingDirectory)/artifacts/$(Application.Name)-$(Build.BuildId).zip
+#            artifact: $(Application.Name)
+#            condition: always()
 
-          - script: |
-              whoami
-              liquibase -version
-              echo $(System.DefaultWorkingDirectory)
-              echo $(Build.SourceBranchName)
-              liquibase flow --flow-file=flows/liquibase-build.flowfile.yaml
-              if [ $? -ne 0 ]; then exit 1; fi
-            env:
-              LIQUIBASE_COMMAND_URL: $(Liquibase-LB-Postgres-Dev-Url)
-              LIQUIBASE_COMMAND_USERNAME: $(Liquibase-LB-Postgres-Username)
-              LIQUIBASE_COMMAND_PASSWORD: $(Liquibase-LB-Postgres-Password)
-              LIQUIBASE_LICENSE_KEY: $(Liquibase-Pro-Key)
-              LB_FLOW_DIR: flows
-              LB_FLOW_ENV: DEV
-            displayName: Liquibase Build
-
-          # Compress files into .zip
-          - task: ArchiveFiles@2
-            condition: always()
-            inputs:
-              rootFolderOrFile: '$(System.DefaultWorkingDirectory)'
-              includeRootFolder: true
-              archiveType: 'zip'
-              archiveFile: '$(System.DefaultWorkingDirectory)/artifacts/$(Application.Name)-$(Build.BuildId).zip'
-
-          # If using Azure Artifacts
-          - upload: $(System.DefaultWorkingDirectory)/artifacts/$(Application.Name)-$(Build.BuildId).zip
-            artifact: $(Application.Name)
-            condition: always()
-
-  - stage: Deploy_to_Prod
-    condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/main'))
-    jobs:
-      - deployment:
-        displayName: Deploy to Prod
-        environment: Postgres-prod
-        strategy:
-          runOnce:
-            deploy:
-              steps:
-                - checkout: LB_REPOSITORY
-                  persistCredentials: true
-                  clean: true
-
-                - script: |
-                    liquibase flow --flow-file=flows/liquibase-deploy.flowfile.yaml
-                    if [ $? -ne 0 ]; then exit 1; fi
-                  env:
-                    LIQUIBASE_COMMAND_URL: $(Liquibase-LB-Postgres-Prod-Url)
-                    LIQUIBASE_COMMAND_USERNAME: $(Liquibase-LB-Postgres-Username)
-                    LIQUIBASE_COMMAND_PASSWORD: $(Liquibase-LB-Postgres-Password)
-                    LIQUIBASE_LICENSE_KEY: $(Liquibase-Pro-Key)
-                    LB_FLOW_DIR: flows
-                    LB_FLOW_ENV: PROD
-                    AWS_S3_BUCKET: asmith-s3-extension-demo
-                    AWS_ACCESS_KEY_ID: $(Liquibase-LB-AWS-ACCESS-KEY-ID)
-                    AWS_SECRET_ACCESS_KEY: $(Liquibase-LB-AWS-SECRET-ACCESS-KEY)
-                    AWS_REGION: us-east-1
-                  displayName: Deploy
-
-                # Compress files into .zip
-                - task: ArchiveFiles@2
-                  condition: and(succeeded(), eq( variables['Build.SourceBranchName'], 'main'))
-                  inputs:
-                    rootFolderOrFile: '$(System.DefaultWorkingDirectory)'
-                    includeRootFolder: true
-                    archiveType: 'zip'
-                    archiveFile: '$(System.DefaultWorkingDirectory)/artifacts/$(Application.Name)-Deploy-$(Build.BuildId).zip'
-
-                # If using Azure Artifacts
-                - upload: $(System.DefaultWorkingDirectory)/artifacts/$(Application.Name)-Deploy-$(Build.BuildId).zip
-                  artifact: $(Application.Name)-Deploy
-                  condition: and(succeeded(), eq( variables['Build.SourceBranchName'], 'main'))
+#  - stage: Deploy_to_Prod
+#    condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/main'))
+#    jobs:
+#      - deployment:
+#        displayName: Deploy to Prod
+#        environment: Postgres-prod
+#        strategy:
+#          runOnce:
+#            deploy:
+#              steps:
+#                - checkout: LB_REPOSITORY
+#                  persistCredentials: true
+#                  clean: true
+#
+#                - script: |
+#                    liquibase flow --flow-file=flows/liquibase-deploy.flowfile.yaml
+#                    if [ $? -ne 0 ]; then exit 1; fi
+#                  env:
+#                    LIQUIBASE_COMMAND_URL: $(Liquibase-LB-Postgres-Prod-Url)
+#                    LIQUIBASE_COMMAND_USERNAME: $(Liquibase-LB-Postgres-Username)
+#                    LIQUIBASE_COMMAND_PASSWORD: $(Liquibase-LB-Postgres-Password)
+#                    LIQUIBASE_LICENSE_KEY: $(Liquibase-Pro-Key)
+#                    LB_FLOW_DIR: flows
+#                    LB_FLOW_ENV: PROD
+#                    AWS_S3_BUCKET: asmith-s3-extension-demo
+#                    AWS_ACCESS_KEY_ID: $(Liquibase-LB-AWS-ACCESS-KEY-ID)
+#                    AWS_SECRET_ACCESS_KEY: $(Liquibase-LB-AWS-SECRET-ACCESS-KEY)
+#                    AWS_REGION: us-east-1
+#                  displayName: Deploy
+#
+#                # Compress files into .zip
+#                - task: ArchiveFiles@2
+#                  condition: and(succeeded(), eq( variables['Build.SourceBranchName'], 'main'))
+#                  inputs:
+#                    rootFolderOrFile: '$(System.DefaultWorkingDirectory)'
+#                    includeRootFolder: true
+#                    archiveType: 'zip'
+#                    archiveFile: '$(System.DefaultWorkingDirectory)/artifacts/$(Application.Name)-Deploy-$(Build.BuildId).zip'
+#
+#                # If using Azure Artifacts
+#                - upload: $(System.DefaultWorkingDirectory)/artifacts/$(Application.Name)-Deploy-$(Build.BuildId).zip
+#                  artifact: $(Application.Name)-Deploy
+#                  condition: and(succeeded(), eq( variables['Build.SourceBranchName'], 'main'))
 
 
 
