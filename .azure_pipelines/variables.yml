@@ -14,5 +14,5 @@ variables:
   # SourceBranchName is used in checkout and labels
   Source.Branch: $(Build.SourceBranchName)
   # Liquibase Root Changelog
-  Liquibase.RootChangelog: /Users/rbowser/code/Automation-Examples/sqlcode/rootchangelog.xml
+#  Liquibase.RootChangelog: /Users/rbowser/code/Automation-Examples/sqlcode/rootchangelog.xml
 
