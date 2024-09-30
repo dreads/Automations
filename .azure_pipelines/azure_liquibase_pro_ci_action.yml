@@ -29,14 +29,13 @@ workspace:
 # See https://learn.microsoft.com/en-us/azure/devops/pipelines/repos/github?view=azure-devops
 resources:
   repositories:
-
-    # Repository for the Tools Project, which includes flows and policies
-    - repository: SRC_REPOSITORY
-      name: $(Git.SrcRepository)
-      type: GitHub
-      endpoint: github.com_dreads
-      source: dreads/Automation-Examples
-      ref: 'refs/heads/develop'
+  # Repository for the Tools Project, which includes flows and policies
+  - repository: SRC_REPOSITORY
+    name: $(Git.SrcRepository)
+    type: GitHub
+    endpoint: github.com_dreads
+    source: dreads/Automation-Examples
+    ref: 'refs/heads/develop'
 # Repository for the Tools Project, which includes flows and policies
 #    - repository: TOOLS_REPOSITORY
 #      name: $(Git.ConfigRepository)
@@ -45,7 +44,6 @@ resources:
 #      endpoint: liquibase
 #      source: adeelmalik78/Automations
 #      ref: 'refs/heads/main'
-
 stages:
 - stage: Run_CI
   condition: true
