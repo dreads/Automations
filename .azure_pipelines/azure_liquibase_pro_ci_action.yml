@@ -38,8 +38,8 @@ resources:
     - repository: TOOLS_REPOSITORY
       name: $(Git.ConfigRepository)
       type: GitHub
-      connection: liquibase
-      endpoint: liquibase
+      type: GitHub
+      endpoint: github.com_dreads
       source: adeelmalik78/Automations
       ref: 'refs/heads/main'
 
