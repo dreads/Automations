@@ -69,14 +69,14 @@ stages:
             clean: true
 
           - script: |
-              liquibase -status
+              liquibase status
             displayName: Use DEV Keys
             condition: eq( variables['Build.SourceBranchName'], 'develop')
             env:
               LIQUIBASE_LICENSE_KEY: $(Liquibase-Pro-Key)
 
           - script: |
-              liquibase -status
+              liquibase status
             displayName: Use QA Keys
             condition: eq( variables['Build.SourceBranchName'], 'qa')
             env:
