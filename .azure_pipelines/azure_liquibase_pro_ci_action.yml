@@ -79,7 +79,7 @@ stages:
               LIQUIBASE_COMMAND_URL: $(liquibase-command-url-dev)
               LIQUIBASE_COMMAND_USERNAME: $(liquibase-command-username-dev)
               LIQUIBASE_COMMAND_PASSWORD: $(liquibase-command-password-dev)
-              LIQUIBASE_SEARCH_PATH: "Automation-Examples,Automations,."
+              LIQUIBASE_SEARCH_PATH: "./Automation-Examples,./Automations,."
 
           - script: |
               liquibase status
