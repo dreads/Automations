@@ -13,8 +13,8 @@ variables:
 
 # The pool used is "Motion Reference Agent Pool"
 # See https://dev.azure.com/rbowser0322/ -> Organization Settings -> Pipelines -> Agent Pools
-pool:
-  name: $(Agent.PoolName)
+#pool:
+#  name: $(Agent.PoolName)
 
 # Delete the entire Pipeline.Workspace directory before running a new job.
 workspace:
