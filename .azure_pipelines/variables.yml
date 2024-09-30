@@ -13,3 +13,5 @@ variables:
   App.Version: $(Build.BuildId)
   # SourceBranchName is used in checkout and labels
   Source.Branch: $(Build.SourceBranchName)
+  # Liquibase Root Changelog
+  Liquibase.RootChangelog: sqlcode/rootchangelog.xml

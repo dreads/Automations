@@ -79,6 +79,7 @@ stages:
               LIQUIBASE_COMMAND_URL: $(liquibase-command-url-dev)
               LIQUIBASE_COMMAND_USERNAME: $(liquibase-command-username-dev)
               LIQUIBASE_COMMAND_PASSWORD: $(liquibase-command-password-dev)
+              LIQUIBASE_SEARCH_PATH: "Automation-Examples,Automations,."
 
           - script: |
               liquibase status
@@ -89,6 +90,7 @@ stages:
               LIQUIBASE_COMMAND_URL: $(liquibase-command-url-qa)
               LIQUIBASE_COMMAND_USERNAME: $(liquibase-command-username-qa)
               LIQUIBASE_COMMAND_PASSWORD: $(liquibase-command-password-qa)
+              LIQUIBASE_SEARCH_PATH: "Automation-Examples,Automations,."
 
           - script: |
               liquibase status
@@ -99,6 +101,7 @@ stages:
               LIQUIBASE_COMMAND_URL: $(liquibase-command-url-prod)
               LIQUIBASE_COMMAND_USERNAME: $(liquibase-command-username-prod)
               LIQUIBASE_COMMAND_PASSWORD: $(liquibase-command-password-prod)
+              LIQUIBASE_SEARCH_PATH: "Automation-Examples,Automations,."
 
 #pr:
 #  branches:
