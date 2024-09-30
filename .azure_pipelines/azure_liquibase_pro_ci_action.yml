@@ -1,5 +1,6 @@
 pr: none
 
+# TODO: Change to PR trigger
 trigger:
   branches:
     include:
@@ -20,13 +21,6 @@ pool:
 resources:
   repositories:
 
-#    - repository: LB_REPOSITORY
-#      name: LiquibasePro
-#      type: git
-#      connection: AzureRepos
-#      source: LiquibasePro
-#      ref: 'refs/heads/main'
-
     # Repository for the Tools Project, which includes flows and policies
     - repository: SRC_REPOSITORY
       name: $(Git.SrcRepository)
@@ -43,14 +37,35 @@ resources:
       ref: 'refs/heads/main'
 
 stages:
-  - stage: Build
+  - stage: Continuous Integration to DEV
     # Check out the code to the runner workspace directory
     jobs:
       - job:
         workspace:
           clean: all
+
       - job:
-        displayName: Custom Policy Checks
+        displayName: Test the license key
+        steps:
+#          - checkout: SRC_REPOSITORY
+#            persistCredentials: true
+#            clean: true
+#
+#          - checkout: TOOLS_REPOSITORY
+#            persistCredentials: true
+#            clean: true
+
+          - script: |
+              whoami
+              du -ah
+              liquibase -version
+              echo $(System.DefaultWorkingDirectory)
+              echo $(Build.SourceBranchName)
+            env:
+              LIQUIBASE_LICENSE_KEY: $(Liquibase-Pro-Key)
+
+      - job:
+        displayName: Test the DB keys
         steps:
           - checkout: SRC_REPOSITORY
             persistCredentials: true
@@ -67,13 +82,8 @@ stages:
               echo $(System.DefaultWorkingDirectory)
               echo $(Build.SourceBranchName)
             env:
-#              LIQUIBASE_COMMAND_URL: $(Liquibase-LB-Postgres-Dev-Url)
-#              LIQUIBASE_COMMAND_USERNAME: $(Liquibase-LB-Postgres-Username)
-#              LIQUIBASE_COMMAND_PASSWORD: $(Liquibase-LB-Postgres-Password)
               LIQUIBASE_LICENSE_KEY: $(Liquibase-Pro-Key)
-#              LB_FLOW_DIR: flows
-#              LB_FLOW_ENV: DEV
-#            displayName: Liquibase Build
+
 #
 #          # Compress files into .zip
 #          - task: ArchiveFiles@2
