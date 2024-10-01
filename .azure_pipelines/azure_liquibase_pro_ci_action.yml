@@ -26,7 +26,8 @@ resources:
       type: GitHub
       endpoint: github.com_dreads
       source: dreads/Automation-Examples
-      ref: 'refs/heads/develop'
+      ref: $(Build.SourceBranchName)
+#      ref: 'refs/heads/develop'
 #      TODO Fix the branch selection
 
     - repository: TOOLS_REPOSITORY
@@ -49,9 +50,9 @@ stages:
         dependsOn: cleanWorkspace
         displayName: Custom Policy Checks
         steps:
-#          - checkout: SRC_REPOSITORY
-#            persistCredentials: true
-#            clean: true
+          - checkout: SRC_REPOSITORY
+            persistCredentials: true
+            clean: true
 
           - checkout: TOOLS_REPOSITORY
             persistCredentials: true
