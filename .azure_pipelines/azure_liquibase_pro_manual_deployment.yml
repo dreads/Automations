@@ -37,11 +37,12 @@ stages:
     # Check out the code to the runner workspace directory
     jobs:
       - job:
+        displayName: Clean workspace
         workspace:
           clean: all
 
       - job:
-        displayName: Test the DB keys
+        displayName: Database Deployment
         steps:
           - checkout: SRC_REPOSITORY
             persistCredentials: true
@@ -56,13 +57,11 @@ stages:
 
           - script: |
               pwd
-              du -ah
-              liquibase status
               liquibase flow \
                  --flow-file=$(FLOW_FILE) \
                  --logfile=logs/liquibase.log
 
-            displayName: Use DEV Keys
+            displayName: Deploy to DEV
             condition: eq( variables['Build.SourceBranchName'], 'develop')
             env:
               LIQUIBASE_LICENSE_KEY: $(Liquibase-Pro-Key)
@@ -73,8 +72,12 @@ stages:
               LIQUIBASE_SEARCH_PATH: "Automation-Examples,Automations,."
 
           - script: |
-              liquibase status
-            displayName: Use QA Keys
+              pwd
+              liquibase flow \
+                 --flow-file=$(FLOW_FILE) \
+                 --logfile=logs/liquibase.log
+
+            displayName: Deploy to QA
             condition: eq( variables['Build.SourceBranchName'], 'qa')
             env:
               LIQUIBASE_LICENSE_KEY: $(Liquibase-Pro-Key)
@@ -85,8 +88,12 @@ stages:
               LIQUIBASE_SEARCH_PATH: "Automation-Examples,Automations,."
 
           - script: |
-              liquibase status
-            displayName: Use PROD Keys
+              pwd
+              liquibase flow \
+                --flow-file=$(FLOW_FILE) \
+                --logfile=logs/liquibase.log
+
+            displayName: Deploy to PROD
             condition: eq( variables['Build.SourceBranchName'], 'prod')
             env:
               LIQUIBASE_LICENSE_KEY: $(Liquibase-Pro-Key)

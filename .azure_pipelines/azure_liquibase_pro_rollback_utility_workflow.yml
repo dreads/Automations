@@ -37,11 +37,12 @@ stages:
     # Check out the code to the runner workspace directory
     jobs:
       - job:
+        displayName: Clean workspace
         workspace:
           clean: all
 
       - job:
-        displayName: Test the DB keys
+        displayName: Rollback One Update
         steps:
           - checkout: SRC_REPOSITORY
             persistCredentials: true
@@ -52,12 +53,10 @@ stages:
             clean: true
 
           - bash: |
-              echo "##vso[task.setvariable variable=FLOW_FILE;]flowfiles/liquibase-postmerge.flowfile.yaml"
+              echo "##vso[task.setvariable variable=FLOW_FILE;]flowfiles/liquibase-rollback.flowfile.yaml"
 
           - script: |
               pwd
-              du -ah
-              liquibase status
               liquibase flow \
                  --flow-file=$(FLOW_FILE) \
                  --logfile=logs/liquibase.log
@@ -73,7 +72,10 @@ stages:
               LIQUIBASE_SEARCH_PATH: "Automation-Examples,Automations,."
 
           - script: |
-              liquibase status
+              pwd
+              liquibase flow \
+                 --flow-file=$(FLOW_FILE) \
+                 --logfile=logs/liquibase.log
             displayName: Use QA Keys
             condition: eq( variables['Build.SourceBranchName'], 'qa')
             env:
@@ -85,7 +87,10 @@ stages:
               LIQUIBASE_SEARCH_PATH: "Automation-Examples,Automations,."
 
           - script: |
-              liquibase status
+              pwd
+              liquibase flow \
+                 --flow-file=$(FLOW_FILE) \
+                 --logfile=logs/liquibase.log
             displayName: Use PROD Keys
             condition: eq( variables['Build.SourceBranchName'], 'prod')
             env:

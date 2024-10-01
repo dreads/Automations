@@ -39,11 +39,12 @@ stages:
     # Check out the code to the runner workspace directory
     jobs:
       - job:
+        displayName: Clean workspace
         workspace:
           clean: all
 
       - job:
-        displayName: Test the DB keys
+        displayName: Database Deployment
         steps:
           - checkout: SRC_REPOSITORY
             persistCredentials: true
@@ -62,7 +63,7 @@ stages:
                  --flow-file=$(FLOW_FILE) \
                  --logfile=logs/liquibase.log
 
-            displayName: Use DEV Keys
+            displayName: CD in DEV
             condition: eq( variables['Build.SourceBranchName'], 'develop')
             env:
               LIQUIBASE_LICENSE_KEY: $(Liquibase-Pro-Key)
