@@ -2,6 +2,8 @@ pr:
   branches:
     include:
       - 'develop'
+      - 'qa'
+      - 'release/*'
 
 name: Continuous Integration of $(Build.SourceBranchName)
 
@@ -25,6 +27,7 @@ resources:
       endpoint: github.com_dreads
       source: dreads/Automation-Examples
       ref: 'refs/heads/develop'
+#      TODO Fix the branch selection
 
     - repository: TOOLS_REPOSITORY
       name: $(Git.ConfigRepository)
@@ -37,12 +40,14 @@ stages:
   - stage: CI_DEV
     # Check out the code to the runner workspace directory
     jobs:
-      - job:
+      - job: cleanWorkspace
+        displayName: Clean workspace
         workspace:
           clean: all
 
-      - job:
-        displayName: Test the DB keys
+      - job: customPolicyChecks
+        dependsOn: cleanWorkspace
+        displayName: Custom Policy Checks
         steps:
           - checkout: SRC_REPOSITORY
             persistCredentials: true
@@ -57,13 +62,11 @@ stages:
 
           - script: |
               pwd
-              du -ah
-              liquibase status
               liquibase flow \
                  --flow-file=$(FLOW_FILE) \
                  --logfile=logs/liquibase.log
 
-            displayName: Use DEV Keys
+            displayName: CI in DEV
             condition: eq( variables['Build.SourceBranchName'], 'develop')
             env:
               LIQUIBASE_LICENSE_KEY: $(Liquibase-Pro-Key)
@@ -73,27 +76,35 @@ stages:
               LIQUIBASE_DEFAULTS_FILE: ./Automation-Examples/liquibase.properties
               LIQUIBASE_SEARCH_PATH: "Automation-Examples,Automations,."
 
-#          - script: |
-#              liquibase status
-#            displayName: Use QA Keys
-#            condition: eq( variables['Build.SourceBranchName'], 'qa')
-#            env:
-#              LIQUIBASE_LICENSE_KEY: $(Liquibase-Pro-Key)
-#              LIQUIBASE_COMMAND_URL: $(liquibase-command-url-qa)
-#              LIQUIBASE_COMMAND_USERNAME: $(liquibase-command-username-qa)
-#              LIQUIBASE_COMMAND_PASSWORD: $(liquibase-command-password-qa)
-#              LIQUIBASE_DEFAULTS_FILE: ./Automation-Examples/liquibase.properties
-#              LIQUIBASE_SEARCH_PATH: "Automation-Examples,Automations,."
+          - script: |
+              pwd
+              liquibase flow \
+                 --flow-file=$(FLOW_FILE) \
+                 --logfile=logs/liquibase.log
 
-#          - script: |
-#              liquibase status
-#            displayName: Use PROD Keys
-#            condition: eq( variables['Build.SourceBranchName'], 'prod')
-#            env:
-#              LIQUIBASE_LICENSE_KEY: $(Liquibase-Pro-Key)
-#              LIQUIBASE_COMMAND_URL: $(liquibase-command-url-prod)
-#              LIQUIBASE_COMMAND_USERNAME: $(liquibase-command-username-prod)
-#              LIQUIBASE_COMMAND_PASSWORD: $(liquibase-command-password-prod)
-#              LIQUIBASE_DEFAULTS_FILE: ./Automation-Examples/liquibase.properties
-#              LIQUIBASE_SEARCH_PATH: "Automation-Examples,Automations,."
+            displayName: CI in QA
+            condition: eq( variables['Build.SourceBranchName'], 'qa')
+            env:
+              LIQUIBASE_LICENSE_KEY: $(Liquibase-Pro-Key)
+              LIQUIBASE_COMMAND_URL: $(liquibase-command-url-qa)
+              LIQUIBASE_COMMAND_USERNAME: $(liquibase-command-username-qa)
+              LIQUIBASE_COMMAND_PASSWORD: $(liquibase-command-password-qa)
+              LIQUIBASE_DEFAULTS_FILE: ./Automation-Examples/liquibase.properties
+              LIQUIBASE_SEARCH_PATH: "Automation-Examples,Automations,."
+
+          - script: |
+              pwd
+              liquibase flow \
+                 --flow-file=$(FLOW_FILE) \
+                 --logfile=logs/liquibase.log
+
+            displayName: CI in PROD
+            condition: eq( variables['Build.SourceBranchName'], 'release/*')
+            env:
+              LIQUIBASE_LICENSE_KEY: $(Liquibase-Pro-Key)
+              LIQUIBASE_COMMAND_URL: $(liquibase-command-url-prod)
+              LIQUIBASE_COMMAND_USERNAME: $(liquibase-command-username-prod)
+              LIQUIBASE_COMMAND_PASSWORD: $(liquibase-command-password-prod)
+              LIQUIBASE_DEFAULTS_FILE: ./Automation-Examples/liquibase.properties
+              LIQUIBASE_SEARCH_PATH: "Automation-Examples,Automations,."
 
