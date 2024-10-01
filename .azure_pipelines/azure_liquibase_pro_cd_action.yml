@@ -44,6 +44,7 @@ stages:
           clean: all
 
       - job:
+        dependsOn: Clean workspace
         displayName: Database Deployment
         steps:
           - checkout: SRC_REPOSITORY

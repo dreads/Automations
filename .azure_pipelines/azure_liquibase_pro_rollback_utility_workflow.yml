@@ -42,6 +42,7 @@ stages:
           clean: all
 
       - job:
+        dependsOn: Clean workspace
         displayName: Rollback One Update
         steps:
           - checkout: SRC_REPOSITORY

@@ -46,6 +46,7 @@ stages:
           clean: all
 
       - job:
+        dependsOn: Clean workspace
         displayName: Custom Policy Checks
         steps:
           - checkout: SRC_REPOSITORY
