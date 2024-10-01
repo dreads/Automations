@@ -99,7 +99,7 @@ stages:
                  --logfile=logs/liquibase.log
 
             displayName: CI in PROD
-            condition: eq( variables['Build.SourceBranchName'], 'release/*')
+            condition: startsWith( variables['Build.SourceBranchName'], 'release/')
             env:
               LIQUIBASE_LICENSE_KEY: $(Liquibase-Pro-Key)
               LIQUIBASE_COMMAND_URL: $(liquibase-command-url-prod)
