@@ -4,6 +4,7 @@ parameters:
     type: string
     default: DEV
     values:
+      - DEV
       - QA
       - PROD
 

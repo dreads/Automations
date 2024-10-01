@@ -64,7 +64,7 @@ stages:
                  --flow-file=$(FLOW_FILE) \
                  --logfile=logs/liquibase.log
 
-            displayName: CD in DEV
+            displayName: Liquibase Deployment to DEV
             condition: eq( variables['Build.SourceBranchName'], 'develop')
             env:
               LIQUIBASE_LICENSE_KEY: $(Liquibase-Pro-Key)
@@ -73,28 +73,3 @@ stages:
               LIQUIBASE_COMMAND_PASSWORD: $(liquibase-command-password-dev)
               LIQUIBASE_DEFAULTS_FILE: ./Automation-Examples/liquibase.properties
               LIQUIBASE_SEARCH_PATH: "Automation-Examples,Automations,."
-
-#          - script: |
-#              liquibase status
-#            displayName: Use QA Keys
-#            condition: eq( variables['Build.SourceBranchName'], 'qa')
-#            env:
-#              LIQUIBASE_LICENSE_KEY: $(Liquibase-Pro-Key)
-#              LIQUIBASE_COMMAND_URL: $(liquibase-command-url-qa)
-#              LIQUIBASE_COMMAND_USERNAME: $(liquibase-command-username-qa)
-#              LIQUIBASE_COMMAND_PASSWORD: $(liquibase-command-password-qa)
-#              LIQUIBASE_DEFAULTS_FILE: ./Automation-Examples/liquibase.properties
-#              LIQUIBASE_SEARCH_PATH: "Automation-Examples,Automations,."
-#
-#          - script: |
-#              liquibase status
-#            displayName: Use PROD Keys
-#            condition: eq( variables['Build.SourceBranchName'], 'prod')
-#            env:
-#              LIQUIBASE_LICENSE_KEY: $(Liquibase-Pro-Key)
-#              LIQUIBASE_COMMAND_URL: $(liquibase-command-url-prod)
-#              LIQUIBASE_COMMAND_USERNAME: $(liquibase-command-username-prod)
-#              LIQUIBASE_COMMAND_PASSWORD: $(liquibase-command-password-prod)
-#              LIQUIBASE_DEFAULTS_FILE: ./Automation-Examples/liquibase.properties
-#              LIQUIBASE_SEARCH_PATH: "Automation-Examples,Automations,."
-
