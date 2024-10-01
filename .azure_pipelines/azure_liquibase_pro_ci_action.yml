@@ -49,9 +49,9 @@ stages:
         dependsOn: cleanWorkspace
         displayName: Custom Policy Checks
         steps:
-          - checkout: SRC_REPOSITORY
-            persistCredentials: true
-            clean: true
+#          - checkout: SRC_REPOSITORY
+#            persistCredentials: true
+#            clean: true
 
           - checkout: TOOLS_REPOSITORY
             persistCredentials: true
