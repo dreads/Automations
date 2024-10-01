@@ -1,10 +1,10 @@
 pr: none
-
-trigger:
-  branches:
-    include:
-      - 'qa'
-      - 'release/*'
+trigger: none
+#trigger:
+#  branches:
+#    include:
+#      - 'qa'
+#      - 'release/*'
 
 name: Manual Deployment of $(Build.SourceBranchName)
 
