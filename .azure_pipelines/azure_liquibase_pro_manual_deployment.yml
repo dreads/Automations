@@ -7,7 +7,6 @@ parameters:
       - QA
       - PROD
 
-
 pr: none
 trigger: none
 
@@ -46,13 +45,13 @@ stages:
   - stage: CD
     # Check out the code to the runner workspace directory
     jobs:
-      - job:
+      - job: cleanWorkspace
         displayName: Clean workspace
         workspace:
           clean: all
 
-      - job:
-        dependsOn: Clean workspace
+      - job: databaseDeployment
+        dependsOn: cleanWorkspace
         displayName: Database Deployment
         steps:
           - checkout: SRC_REPOSITORY
