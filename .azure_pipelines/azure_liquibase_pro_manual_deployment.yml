@@ -1,9 +1,17 @@
-trigger:
-  branches:
-    include:
-      - 'develop'
+parameters:
+  - name: target_environment
+    displayName: Target Environment
+    type: string
+    default: DEV
+    values:
+      - DEV
+      - QA
+      - PROD
 
-name: Continuous Deployment of $(Build.SourceBranchName)
+pr: none
+trigger: none
+
+name: Manual Deployment of $(Build.SourceBranchName)
 
 # Use the Liquibase_Variables variable group to get credentials from Azure key vault
 # https://learn.microsoft.com/en-us/azure/devops/pipelines/library/variable-groups?view=azure-devops&tabs=yaml#use-a-variable-group
@@ -64,7 +72,7 @@ stages:
                  --flow-file=$(FLOW_FILE) \
                  --logfile=logs/liquibase.log
 
-            displayName: Liquibase Deployment to DEV
+            displayName: Deploy to DEV
             condition: eq( variables['Build.SourceBranchName'], 'develop')
             env:
               LIQUIBASE_LICENSE_KEY: $(Liquibase-Pro-Key)
@@ -73,3 +81,36 @@ stages:
               LIQUIBASE_COMMAND_PASSWORD: $(liquibase-command-password-dev)
               LIQUIBASE_DEFAULTS_FILE: ./Automation-Examples/liquibase.properties
               LIQUIBASE_SEARCH_PATH: "Automation-Examples,Automations,."
+
+          - script: |
+              pwd
+              liquibase flow \
+                 --flow-file=$(FLOW_FILE) \
+                 --logfile=logs/liquibase.log
+
+            displayName: Deploy to QA
+            condition: eq( variables['Build.SourceBranchName'], 'qa')
+            env:
+              LIQUIBASE_LICENSE_KEY: $(Liquibase-Pro-Key)
+              LIQUIBASE_COMMAND_URL: $(liquibase-command-url-qa)
+              LIQUIBASE_COMMAND_USERNAME: $(liquibase-command-username-qa)
+              LIQUIBASE_COMMAND_PASSWORD: $(liquibase-command-password-qa)
+              LIQUIBASE_DEFAULTS_FILE: ./Automation-Examples/liquibase.properties
+              LIQUIBASE_SEARCH_PATH: "Automation-Examples,Automations,."
+
+          - script: |
+              pwd
+              liquibase flow \
+                --flow-file=$(FLOW_FILE) \
+                --logfile=logs/liquibase.log
+
+            displayName: Deploy to PROD
+            condition: eq( variables['Build.SourceBranchName'], 'prod')
+            env:
+              LIQUIBASE_LICENSE_KEY: $(Liquibase-Pro-Key)
+              LIQUIBASE_COMMAND_URL: $(liquibase-command-url-prod)
+              LIQUIBASE_COMMAND_USERNAME: $(liquibase-command-username-prod)
+              LIQUIBASE_COMMAND_PASSWORD: $(liquibase-command-password-prod)
+              LIQUIBASE_DEFAULTS_FILE: ./Automation-Examples/liquibase.properties
+              LIQUIBASE_SEARCH_PATH: "Automation-Examples,Automations,."
+

@@ -16,22 +16,22 @@
     </changeSet>
 
 <!-- create_product_01-->
-    <changeSet id="create_product_01.sql" failOnError="true" runOnChange="true" author="lb-uat">
-        <sqlFile path="ddl/create_product_01.sql" splitStatements="true" endDelimiter=";" stripComments="true" relativeToChangelogFile="true"/>
-        <rollback>
-            <sqlFile path="ddl/create_product_01-rollback.sql" stripComments="false"
-                     relativeToChangelogFile="true"/>
-        </rollback>
-    </changeSet>
-    <!--    create_product_02-->
-    <changeSet id="create_product_02.sql" failOnError="true" runOnChange="true" author="lb-uat">
-        <sqlFile path="ddl/create_product_02.sql" splitStatements="true" endDelimiter=";" stripComments="true" relativeToChangelogFile="true"/>
-        <!--    add rollback -->
-        <rollback>
-            <sqlFile path="ddl/create_product_02-rollback.sql" stripComments="false"
-                     relativeToChangelogFile="true"/>
-        </rollback>
-    </changeSet>
+<!--    <changeSet id="create_product_01.sql" failOnError="true" runOnChange="true" author="lb-uat">-->
+<!--        <sqlFile path="ddl/create_product_01.sql" splitStatements="true" endDelimiter=";" stripComments="true" relativeToChangelogFile="true"/>-->
+<!--        <rollback>-->
+<!--            <sqlFile path="ddl/create_product_01-rollback.sql" stripComments="false"-->
+<!--                     relativeToChangelogFile="true"/>-->
+<!--        </rollback>-->
+<!--    </changeSet>-->
+<!--    &lt;!&ndash;    create_product_02&ndash;&gt;-->
+<!--    <changeSet id="create_product_02.sql" failOnError="true" runOnChange="true" author="lb-uat">-->
+<!--        <sqlFile path="ddl/create_product_02.sql" splitStatements="true" endDelimiter=";" stripComments="true" relativeToChangelogFile="true"/>-->
+<!--        &lt;!&ndash;    add rollback &ndash;&gt;-->
+<!--        <rollback>-->
+<!--            <sqlFile path="ddl/create_product_02-rollback.sql" stripComments="false"-->
+<!--                     relativeToChangelogFile="true"/>-->
+<!--        </rollback>-->
+<!--    </changeSet>-->
     <!--    create_product_02-->
 <!--    <changeSet id="count-changelogs" failOnError="false" runOnChange="true" runAlways="true" author="lb-uat">-->
 <!--        <sqlFile path="liquibase-utility-changesets/changelog_metrics.sql" splitStatements="true" endDelimiter=";" stripComments="true" relativeToChangelogFile="true"/>-->
