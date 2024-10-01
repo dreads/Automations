@@ -1,0 +1,99 @@
+pr:
+  branches:
+    include:
+      - 'develop'
+
+name: Continuous Integration of $(Build.SourceBranchName)
+
+# Use the Liquibase_Variables variable group to get credentials from Azure key vault
+# https://learn.microsoft.com/en-us/azure/devops/pipelines/library/variable-groups?view=azure-devops&tabs=yaml#use-a-variable-group
+
+variables:
+  - template: ./variables.yml
+  - group: Liquibase_Variables
+
+pool:
+  name: $(Agent.PoolName)
+
+resources:
+  repositories:
+
+    # Repository for the Tools Project, which includes flows and policies
+    - repository: SRC_REPOSITORY
+      name: $(Git.SrcRepository)
+      type: GitHub
+      endpoint: github.com_dreads
+      source: dreads/Automation-Examples
+      ref: 'refs/heads/develop'
+
+    - repository: TOOLS_REPOSITORY
+      name: $(Git.ConfigRepository)
+      type: GitHub
+      endpoint: github.com_dreads
+      source: adeelmalik78/Automations
+      ref: 'refs/heads/main'
+
+stages:
+  - stage: CI_DEV
+    # Check out the code to the runner workspace directory
+    jobs:
+      - job:
+        workspace:
+          clean: all
+
+      - job:
+        displayName: Test the DB keys
+        steps:
+          - checkout: SRC_REPOSITORY
+            persistCredentials: true
+            clean: true
+
+          - checkout: TOOLS_REPOSITORY
+            persistCredentials: true
+            clean: true
+
+          - bash: |
+              echo "##vso[task.setvariable variable=FLOW_FILE;]flowfiles/liquibase-premerge.flowfile.yaml"
+
+          - script: |
+              pwd
+              du -ah
+              liquibase status
+              liquibase flow \
+                 --flow-file=$(FLOW_FILE) \
+                 --logfile=logs/liquibase.log
+
+            displayName: Use DEV Keys
+            condition: eq( variables['Build.SourceBranchName'], 'develop')
+            env:
+              LIQUIBASE_LICENSE_KEY: $(Liquibase-Pro-Key)
+              LIQUIBASE_COMMAND_URL: $(Liquibase-command-url-dev)
+              LIQUIBASE_COMMAND_USERNAME: $(liquibase-command-username-dev)
+              LIQUIBASE_COMMAND_PASSWORD: $(liquibase-command-password-dev)
+              LIQUIBASE_DEFAULTS_FILE: ./Automation-Examples/liquibase.properties
+              LIQUIBASE_SEARCH_PATH: "Automation-Examples,Automations,."
+
+#          - script: |
+#              liquibase status
+#            displayName: Use QA Keys
+#            condition: eq( variables['Build.SourceBranchName'], 'qa')
+#            env:
+#              LIQUIBASE_LICENSE_KEY: $(Liquibase-Pro-Key)
+#              LIQUIBASE_COMMAND_URL: $(liquibase-command-url-qa)
+#              LIQUIBASE_COMMAND_USERNAME: $(liquibase-command-username-qa)
+#              LIQUIBASE_COMMAND_PASSWORD: $(liquibase-command-password-qa)
+#              LIQUIBASE_DEFAULTS_FILE: ./Automation-Examples/liquibase.properties
+#              LIQUIBASE_SEARCH_PATH: "Automation-Examples,Automations,."
+
+#          - script: |
+#              liquibase status
+#            displayName: Use PROD Keys
+#            condition: eq( variables['Build.SourceBranchName'], 'prod')
+#            env:
+#              LIQUIBASE_LICENSE_KEY: $(Liquibase-Pro-Key)
+#              LIQUIBASE_COMMAND_URL: $(liquibase-command-url-prod)
+#              LIQUIBASE_COMMAND_USERNAME: $(liquibase-command-username-prod)
+#              LIQUIBASE_COMMAND_PASSWORD: $(liquibase-command-password-prod)
+#              LIQUIBASE_DEFAULTS_FILE: ./Automation-Examples/liquibase.properties
+#              LIQUIBASE_SEARCH_PATH: "Automation-Examples,Automations,."
+

@@ -1,0 +1,18 @@
+variables:
+  # Project.Name is not currently used in the pipeline operations
+  Project.Name: implementation_guide
+  # Application.Name is used in the pipeline run name and artifact creation/upload steps
+  Application.Name: Implementation Guide Azure DevOps Example Application
+  # Repository for Liquibase changelogs and liquibase.properties
+  Git.SrcRepository: dreads/Automation-Examples
+  # Repository for Liquibase Pro config files, such as flow and policy checks
+  Git.ConfigRepository: adeelmalik78/Automations
+  # Name of Agent pool which is managed at the ADO organization level in Pipelines->Agent Pools
+  Agent.PoolName: CS_Guide
+  # BuildId is used in the pipeline run name, labels, and artifact creation/upload steps
+  App.Version: $(Build.BuildId)
+  # SourceBranchName is used in checkout and labels
+  Source.Branch: $(Build.SourceBranchName)
+  # Liquibase Root Changelog
+#  Liquibase.RootChangelog: /Users/rbowser/code/Automation-Examples/sqlcode/rootchangelog.xml
+
