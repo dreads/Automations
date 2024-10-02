@@ -21,11 +21,6 @@ variables:
   - template: ./variables.yml
   - group: Liquibase_Variables
 
-  - name: "branchName"
-    ${{ if eq($(BuildBuild.Reason), 'PullRequest') }}:
-      value: $(System.PullRequest.SourceBranch)
-    ${{ else }}:
-      value: $(Build.SourceBranch)
 pool:
   name: $(Agent.PoolName)
 
