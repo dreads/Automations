@@ -34,7 +34,7 @@ resources:
       type: GitHub
       endpoint: github.com_dreads
       source: dreads/Automation-Examples
-      ref: $(System.PullRequest.SourceBranch)
+#      ref: $(System.PullRequest.SourceBranch)
 #      TODO Fix the branch selection
 
     - repository: TOOLS_REPOSITORY
