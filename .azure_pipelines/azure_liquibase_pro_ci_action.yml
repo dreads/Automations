@@ -26,8 +26,15 @@ resources:
       type: GitHub
       endpoint: github.com_dreads
       source: dreads/Automation-Examples
-      ref: $(Build.SourceBranchName)
-#      ref: 'refs/heads/develop'
+      ref: 'refs/heads/develop'
+
+    # Repository for the Tools Project, which includes flows and policies
+    - repository: SRC_REPOSITORY
+      name: $(Git.SrcRepository)
+      type: GitHub
+      endpoint: github.com_dreads
+      source: dreads/Automation-Examples
+      ref: $(System.PullRequest.SourceBranch)
 #      TODO Fix the branch selection
 
     - repository: TOOLS_REPOSITORY
