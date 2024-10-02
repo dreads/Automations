@@ -82,7 +82,7 @@ stages:
                  --logfile=logs/liquibase.log
 
             displayName: CI in DEV
-            condition: eq( variables['Build.SourceBranchName'], 'develop') || startsWith( variables['Build.SourceBranchName'], 'JIRA-')
+            condition: or(eq( variables['Build.SourceBranchName'], 'develop'),startsWith( variables['Build.SourceBranchName'], 'JIRA-'))
             env:
               LIQUIBASE_LICENSE_KEY: $(Liquibase-Pro-Key)
               LIQUIBASE_COMMAND_URL: $(Liquibase-command-url-dev)
