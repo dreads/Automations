@@ -25,7 +25,7 @@ variables:
     ${{ if eq($(BuildBuild.Reason), 'PullRequest') }}:
       value: $(System.PullRequest.SourceBranch)
     ${{ else }}:
-      value: ${{ Build.SourceBranch }}
+      value: $(Build.SourceBranch)
 pool:
   name: $(Agent.PoolName)
 
