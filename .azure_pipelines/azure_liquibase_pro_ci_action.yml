@@ -22,7 +22,7 @@ variables:
   - group: Liquibase_Variables
 
   - name: "branchName"
-    ${{ if eq(Build.Reason, 'PullRequest') }}:
+    ${{ if eq($(BuildBuild.Reason), 'PullRequest') }}:
       value: $(System.PullRequest.SourceBranch)
     ${{ else }}:
       value: ${{ Build.SourceBranch }}
