@@ -12,21 +12,21 @@ echo
 echo "*** Starting postgres-dev ... "
 docker run \
     --name postgres-dev \
-    -p 5432:5432 \
+    -p 5433:5432 \
     -e POSTGRES_PASSWORD=secret \
     -d postgres
 
 echo "*** Starting postgres-qa ... "
 docker run \
     --name postgres-qa \
-    -p 5433:5432 \
+    -p 5434:5432 \
     -e POSTGRES_PASSWORD=secret \
     -d postgres
 
 echo "*** Starting postgres-prod ... "
 docker run \
     --name postgres-prod \
-    -p 5434:5432 \
+    -p 5435:5432 \
     -e POSTGRES_PASSWORD=secret \
     -d postgres
 
