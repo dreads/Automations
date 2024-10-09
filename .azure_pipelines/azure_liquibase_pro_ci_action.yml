@@ -1,7 +1,6 @@
 pr:
   branches:
     include:
-      - 'JIRA-*'
       - 'develop'
       - 'qa'
       - 'release/*'
