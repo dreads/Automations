@@ -64,6 +64,12 @@ stages:
         dependsOn: cleanWorkspace
         displayName: Custom Policy Checks
         steps:
+          # Debugging script to show all available variables
+          - script: |
+              for var in $(compgen -e); do
+                echo $var ${!var};
+              done
+
           - checkout: SRC_REPOSITORY
             persistCredentials: true
             clean: true
