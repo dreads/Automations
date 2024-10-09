@@ -5,7 +5,6 @@ databaseChangeLog:
     file: schema1/schema1changelog.yaml
     relativeToChangelogFile: true
 
-
 ## schema2 = public
 #- include:
 #    file: schema2/schema2changelog.yaml
