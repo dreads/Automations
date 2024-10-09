@@ -12,18 +12,18 @@ databaseChangeLog:
             path: customer-rollback.sql
             relativeToChangelogFile: true
 
-#- changeSet:
-#    id: actor
-#    author: workshop-user
-#    changes:
-#    - sqlFile:
-#        path: actor.sql
-#        relativeToChangelogFile: true
-#    - rollback:
-#        - sqlFile:
-#            path: actor-rollback.sql
-#            relativeToChangelogFile: true
-#
+- changeSet:
+    id: actor
+    author: workshop-user
+    changes:
+    - sqlFile:
+        path: actor.sql
+        relativeToChangelogFile: true
+    - rollback:
+        - sqlFile:
+            path: actor-rollback.sql
+            relativeToChangelogFile: true
+
 #- changeSet:
 #    id: category
 #    author: workshop-user
