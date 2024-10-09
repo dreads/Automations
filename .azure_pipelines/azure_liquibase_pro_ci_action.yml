@@ -1,9 +1,16 @@
 pr:
   branches:
     include:
+      - 'JIRA-*'
       - 'develop'
       - 'qa'
       - 'release/*'
+  paths:
+    exclude:
+      - .azure_pipelines/azure_liquibase_pro_cd_action.yml
+      - .azure_pipelines/azure_liquibase_pro_ci_action.yml
+      - .azure_pipelines/azure_liquibase_pro_manual_deployment.yml
+      - .azure_pipelines/azure_liquibase_pro_rollback_utility_workflow.yml
 
 name: Continuous Integration of $(Build.SourceBranchName)
 
@@ -21,12 +28,20 @@ resources:
   repositories:
 
     # Repository for the Tools Project, which includes flows and policies
+#    - repository: SRC_REPOSITORY
+#      name: $(Git.SrcRepository)
+#      type: GitHub
+#      endpoint: github.com_dreads
+#      source: dreads/Automation-Examples
+#      ref: 'refs/heads/develop'
+
+    # Repository for the Tools Project, which includes flows and policies
     - repository: SRC_REPOSITORY
       name: $(Git.SrcRepository)
       type: GitHub
       endpoint: github.com_dreads
       source: dreads/Automation-Examples
-      ref: 'refs/heads/develop'
+      ref: $(Build.SourceBranchName)
 #      TODO Fix the branch selection
 
     - repository: TOOLS_REPOSITORY
@@ -67,7 +82,7 @@ stages:
                  --logfile=logs/liquibase.log
 
             displayName: CI in DEV
-            condition: eq( variables['Build.SourceBranchName'], 'develop')
+            condition: or(eq( variables['Build.SourceBranchName'], 'develop'),startsWith( variables['Build.SourceBranchName'], 'JIRA-'))
             env:
               LIQUIBASE_LICENSE_KEY: $(Liquibase-Pro-Key)
               LIQUIBASE_COMMAND_URL: $(Liquibase-command-url-dev)
