@@ -1,15 +1,16 @@
-pr:
-  branches:
-    include:
-      - 'develop'
-      - 'qa'
-      - 'release/*'
-  paths:
-    exclude:
-      - .azure_pipelines/azure_liquibase_pro_cd_action.yml
-      - .azure_pipelines/azure_liquibase_pro_ci_action.yml
-      - .azure_pipelines/azure_liquibase_pro_manual_deployment.yml
-      - .azure_pipelines/azure_liquibase_pro_rollback_utility_workflow.yml
+#pr:
+#  branches:
+#    include:
+#      - 'develop'
+#      - 'qa'
+#      - 'release/*'
+#  paths:
+#    exclude:
+#      - .azure_pipelines/azure_liquibase_pro_cd_action.yml
+#      - .azure_pipelines/azure_liquibase_pro_ci_action.yml
+#      - .azure_pipelines/azure_liquibase_pro_manual_deployment.yml
+#      - .azure_pipelines/azure_liquibase_pro_rollback_utility_workflow.yml
+pr: none
 
 name: Continuous Integration of $(Build.SourceBranchName)
 
