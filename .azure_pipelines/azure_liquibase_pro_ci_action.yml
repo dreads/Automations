@@ -42,9 +42,7 @@ resources:
       type: GitHub
       endpoint: github.com_dreads
       source: dreads/Automation-Examples
-      ref: 'refs/heads/develop'
-#      ref: $(Build.SourceBranchName)
-#      TODO Fix the branch selection
+      ref: $(Build.SourceBranchName)
 
     - repository: TOOLS_REPOSITORY
       name: $(Git.ConfigRepository)
