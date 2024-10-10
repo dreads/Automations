@@ -48,7 +48,7 @@ stages:
         displayName: Database Deployment
 
         steps:
-          - # Debugging script to show all available variables
+          # Debugging script to show all available variables
           - script: |
               for var in $(compgen -e); do
                 echo $var ${!var};
