@@ -46,7 +46,14 @@ stages:
       - job: databaseDeployment
         dependsOn: cleanWorkspace
         displayName: Database Deployment
+
         steps:
+          # Debugging script to show all available variables
+          - script: |
+              for var in $(compgen -e); do
+                echo $var ${!var};
+              done
+
           - checkout: SRC_REPOSITORY
             persistCredentials: true
             clean: true
