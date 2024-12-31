@@ -1,51 +1,33 @@
-#pr:
-#  branches:
-#    include:
-#      - 'develop'
-#      - 'qa'
-#      - 'release/*'
-#  paths:
-#    exclude:
-#      - .azure_pipelines/azure_liquibase_pro_cd_action.yml
-#      - .azure_pipelines/azure_liquibase_pro_ci_action.yml
-#      - .azure_pipelines/azure_liquibase_pro_manual_deployment.yml
-#      - .azure_pipelines/azure_liquibase_pro_rollback_utility_workflow.yml
+#####################################################################
+#  Azure Pipeline to perform continuous integration (CI) of database
+#  changes using Liquibase Pro, Liquibase Pro Flows, and Custom
+#  Policy checks.
+#####################################################################
 pr: none
 
 name: Continuous Integration of $(Build.SourceBranchName)
 
-# Use the Liquibase_Variables variable group to get credentials from Azure key vault
-# https://learn.microsoft.com/en-us/azure/devops/pipelines/library/variable-groups?view=azure-devops&tabs=yaml#use-a-variable-group
-
+#####################################################################
+#  Load variables from the template alongside secrets and variables
+#  linked from Azure Key Vault.
+#####################################################################
 variables:
   - template: ./variables.yml
   - group: Liquibase_Variables
 
+#####################################################################
+# The Agent Pool where this pipeline runs. Defined in variables.yml
+#####################################################################
 pool:
   name: $(Agent.PoolName)
 
+#####################################################################
+# The repositories needed to run, build, and deploy.
+#####################################################################
 resources:
   repositories:
 
     # Repository for the Tools Project, which includes flows and policies
-    #    - repository: SRC_REPOSITORY
-    #      name: $(Git.SrcRepository)
-    #      type: GitHub
-    #      endpoint: github.com_dreads
-    #      source: dreads/Automation-Examples
-    #      ref: 'refs/heads/develop'
-
-
-    # Repository for the Tools Project, which includes flows and policies
-    - repository: SRC_REPOSITORY
-      name: $(Git.SrcRepository)
-      type: GitHub
-      endpoint: github.com_dreads
-      source: dreads/Automation-Examples
-      ref: 'refs/heads/develop'
-#      ref: $(Build.SourceBranchName)
-#      TODO Fix the branch selection
-
     - repository: TOOLS_REPOSITORY
       name: $(Git.ConfigRepository)
       type: GitHub
@@ -53,15 +35,21 @@ resources:
       source: adeelmalik78/Automations
       ref: 'refs/heads/main'
 
+###################################################################
+# Stage are logical boundaries in an Azure DevOps pipeline. We only
+# need one.
+###################################################################
 stages:
-  - stage: CI_DEV
-    # Check out the code to the runner workspace directory
+  - stage: CI
     jobs:
+      # Clean the workspace of cached data
       - job: cleanWorkspace
         displayName: Clean workspace
         workspace:
           clean: all
 
+      # After cleaning workspace run the job shown as "Custom
+      # Policy Checks" in the UI and in Github Branch Protection "Required Checks"
       - job: customPolicyChecks
         dependsOn: cleanWorkspace
         displayName: Custom Policy Checks
@@ -71,33 +59,44 @@ stages:
               for var in $(compgen -e); do
                 echo $var ${!var};
               done
+            displayName: Show all variables
 
-          - checkout: SRC_REPOSITORY
+          # Check out the code
+          - checkout: self
             persistCredentials: true
             clean: true
+            displayName: Check out self
 
+          # Check out the tools repository with flow files and Custom Checks configs
           - checkout: TOOLS_REPOSITORY
             persistCredentials: true
             clean: true
+            displayName: Check out Tools Repository
 
+          # Set the environment variable FLOW_FILE to use the "pre-merge"
+          # flow consisting mainly of quality checks
           - bash: |
               echo "##vso[task.setvariable variable=FLOW_FILE;]flowfiles/liquibase-premerge.flowfile.yaml"
 
+          # Run Liquibase using LIQUIBASE_COMMAND_URL, LIQUIBASE_COMMAND_USERNAME, and LIQUIBASE_COMMAND_PASSWORD in
+          # the environment. Note the "-dev", "-qa", and "-prod" suffixes for those values in the 'env' section.
           - script: |
               pwd
+              du -ah
               liquibase flow \
                  --flow-file=$(FLOW_FILE) \
                  --logfile=logs/liquibase.log
-
-            displayName: CI in DEV
+            displayName: Run Liquibase in DEV
+            # This condition controls whether this step runs. It will trigger when the branch is 'develop' or
+            # starts with 'JIRA-'.
             condition: or(eq( variables['Build.SourceBranchName'], 'develop'),startsWith( variables['Build.SourceBranchName'], 'JIRA-'))
             env:
               LIQUIBASE_LICENSE_KEY: $(Liquibase-Pro-Key)
               LIQUIBASE_COMMAND_URL: $(Liquibase-command-url-dev)
               LIQUIBASE_COMMAND_USERNAME: $(liquibase-command-username-dev)
               LIQUIBASE_COMMAND_PASSWORD: $(liquibase-command-password-dev)
-              LIQUIBASE_DEFAULTS_FILE: ./Automation-Examples/liquibase.properties
-              LIQUIBASE_SEARCH_PATH: "Automation-Examples,Automations,."
+              LIQUIBASE_DEFAULTS_FILE: ./cs-impl-guide-examples/liquibase.properties
+              LIQUIBASE_SEARCH_PATH: "cs-impl-guide-examples,Automations,."
 
           - script: |
               pwd
@@ -105,15 +104,16 @@ stages:
                  --flow-file=$(FLOW_FILE) \
                  --logfile=logs/liquibase.log
 
-            displayName: CI in QA
+            displayName: Run Liquibase in QA
+            # This condition controls whether this step runs. It will trigger when the branch is 'qa'
             condition: eq( variables['Build.SourceBranchName'], 'qa')
             env:
               LIQUIBASE_LICENSE_KEY: $(Liquibase-Pro-Key)
               LIQUIBASE_COMMAND_URL: $(liquibase-command-url-qa)
               LIQUIBASE_COMMAND_USERNAME: $(liquibase-command-username-qa)
               LIQUIBASE_COMMAND_PASSWORD: $(liquibase-command-password-qa)
-              LIQUIBASE_DEFAULTS_FILE: ./Automation-Examples/liquibase.properties
-              LIQUIBASE_SEARCH_PATH: "Automation-Examples,Automations,."
+              LIQUIBASE_DEFAULTS_FILE: ./cs-impl-guide-examples/liquibase.properties
+              LIQUIBASE_SEARCH_PATH: "cs-impl-guide-examples,Automations,."
 
           - script: |
               pwd
@@ -121,13 +121,14 @@ stages:
                  --flow-file=$(FLOW_FILE) \
                  --logfile=logs/liquibase.log
 
-            displayName: CI in PROD
+            displayName: Run Liquibase in PROD
+            # This condition controls whether this step runs. It will trigger when the branch starts with 'release/'
             condition: startsWith( variables['Build.SourceBranchName'], 'release/')
             env:
               LIQUIBASE_LICENSE_KEY: $(Liquibase-Pro-Key)
               LIQUIBASE_COMMAND_URL: $(liquibase-command-url-prod)
               LIQUIBASE_COMMAND_USERNAME: $(liquibase-command-username-prod)
               LIQUIBASE_COMMAND_PASSWORD: $(liquibase-command-password-prod)
-              LIQUIBASE_DEFAULTS_FILE: ./Automation-Examples/liquibase.properties
-              LIQUIBASE_SEARCH_PATH: "Automation-Examples,Automations,."
+              LIQUIBASE_DEFAULTS_FILE: ./cs-impl-guide-examples/liquibase.properties
+              LIQUIBASE_SEARCH_PATH: "cs-impl-guide-examples,Automations,."
 

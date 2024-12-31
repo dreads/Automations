@@ -11,7 +11,9 @@ run-name: Continuous Deployment of ${{github.ref}} by ${{ github.actor }}
 # including merging a PR or bypassing rules and pushing directly to
 # the branch as a repository administrator. When this workflow
 # executes, it will deploy all pending changes, including any which
-# have been previously rolled back.
+# have been previously rolled back. Since the GitHub Actions and
+# Azure Pipelines files are housed in the same repository, we safely
+# ignore any changes to the Azure workflows.
 #
 # To extend CD to other environments, add their corresponding
 # branches here.
@@ -19,6 +21,8 @@ on:
   push:
     branches:
       - 'develop'
+    paths-ignore:
+      - '.azure_pipelines/**'
 
 #####################################################################
 #  Set up the environment
